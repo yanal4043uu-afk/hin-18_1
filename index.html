@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محادثة Cow-Girl-Emma-148005</title>
+  <style>
+    * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: #0d1017;
+      color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #161b26;
+      padding: 14px 18px;
+      border-bottom: 1px solid #242c3d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .bot-info strong { color: #60a5fa; }
+    .status {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #143322;
+      color: #4ade80;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .status.offline {
+      background: #3b1518;
+      color: #f87171;
+    }
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bubble {
+      max-width: 78%;
+      padding: 11px 15px;
+      border-radius: 14px;
+      line-height: 1.65;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .user {
+      align-self: flex-start;
+      background: #2563eb;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+    .bot {
+      align-self: flex-end;
+      background: #1a202c;
+      color: #e5e7eb;
+      border: 1px solid #2d3748;
+      border-bottom-left-radius: 4px;
+    }
+    .error {
+      align-self: center;
+      background: #3f161a;
+      color: #fca5a5;
+      border: 1px solid #991b1b;
+      font-size: 13px;
+    }
+    form {
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #161b26;
+      border-top: 1px solid #242c3d;
+    }
+    input {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #2d3748;
+      background: #0d1017;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus { border-color: #3b82f6; }
+    button {
+      padding: 0 22px;
+      border-radius: 10px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bot-info">
+      البوت: <strong>Cow-Girl-Emma-148005</strong> | الجلسة: <strong>21702378</strong>
+    </div>
+    <div id="status" class="status">جاهز</div>
+  </header>
+
+  <div id="chat"></div>
+
+  <form id="form">
+    <input id="input" type="text" placeholder="اكتب رسالتك هنا..." autocomplete="off" required />
+    <button id="send" type="submit">إرسال</button>
+  </form>
+
+  <script>
+    // ضع هنا رابط السيرفر الخاص بك على Render متبوعاً بـ /api/chat
+    const BACKEND_URL = "https://YOUR-RENDER-SERVICE.onrender.com/api/chat";
+
+    const chatEl = document.getElementById("chat");
+    const formEl = document.getElementById("form");
+    const inputEl = document.getElementById("input");
+    const sendEl = document.getElementById("send");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(text, isOffline = false) {
+      statusEl.textContent = text;
+      statusEl.classList.toggle("offline", isOffline);
+    }
+
+    function addMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = `bubble ${role}`;
+      div.textContent = text;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      return div;
+    }
+
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      inputEl.value = "";
+      inputEl.disabled = true;
+      sendEl.disabled = true;
+      setStatus("جاري الإرسال...");
+
+      const typingEl = addMessage("يكتب...", "bot");
+
+      try {
+        const res = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        typingEl.remove();
+
+        if (!res.ok || data.ok === false) {
+          addMessage(data.error || "حدث خطأ أثناء الاتصال بالنموذج", "error");
+          setStatus("خطأ في الرد", true);
+          return;
+        }
+
+        addMessage(data.reply || "لم يصل نص رد من النموذج", "bot");
+        setStatus("متصل");
+      } catch (err) {
+        typingEl.remove();
+        addMessage("تعذر الوصول إلى الخادم على Render — تأكد من رابط BACKEND_URL وتشغيل الخدمة", "error");
+        setStatus("غير متصل", true);
+      } finally {
+        inputEl.disabled = false;
+        sendEl.disabled = false;
+        inputEl.focus();
+      }
+    });
+  </script>
+</body>
+</html>
