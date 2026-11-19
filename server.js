@@ -6,10 +6,12 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const BOT_ID = "148005";
-const SESSION_ID = "21702378";
-const AUTH_TOKEN = process.env.AUTH_TOKEN;
-const FINGERPRINT = "254810a4c9b915cab1ec39f6174f7908";
+const BOT_ID = 148005;
+const SESSION_ID = 21702378;
+const UID = "f0caea4f-3e19-4fc9-9bc4-fa0223fdbcab";
+const USER_ID = 13123914;
+const AUTH_TOKEN = (process.env.AUTH_TOKEN || "").trim();
+const FINGERPRINT = "254810a4c9b915cab1ac39f6174f7908";
 
 app.get('/health', (req, res) => {
   res.json({ status: "ok", botId: BOT_ID, sessionId: SESSION_ID });
@@ -30,23 +32,22 @@ app.post('/api/chat', async (req, res) => {
     const response = await fetch('https://www.yollo.ai/api/msg/send', {
       method: 'POST',
       headers: {
-        'Host': 'www.yollo.ai',
         'User-Agent': 'Mozilla/5.0 (Android 11; Mobile; rv:144.0) Gecko/144.0 Firefox/144.0',
         'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'ar-EG',
+        'Accept-Language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7',
         'Content-Type': 'application/json',
         'x-auth-token': AUTH_TOKEN,
         'x-finger': FINGERPRINT,
         'Origin': 'https://www.yollo.ai',
-        'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`,
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-origin'
+        'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`
       },
       body: JSON.stringify({
-        botId: Number(BOT_ID),
+        botId: BOT_ID,
         sessionId: SESSION_ID,
+        uid: UID,
+        userId: USER_ID,
         content: message.trim(),
+        msg: message.trim(),
         type: "text"
       })
     });
@@ -56,6 +57,7 @@ app.post('/api/chat', async (req, res) => {
     const botReply =
       data?.data?.reply ||
       data?.data?.content ||
+      data?.data?.msg ||
       data?.reply ||
       data?.content ||
       data?.msg ||
