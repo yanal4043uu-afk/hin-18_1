@@ -8,8 +8,12 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const BOT_ID = 148005;
 const SESSION_ID = 21702378;
+const USER_ID = 13123914;
+const UUID = "f0caea4f-3e19-4fc9-9bc4-fa0223fdbcab";
 const AUTH_TOKEN = (process.env.AUTH_TOKEN || "").trim();
 const FINGERPRINT = "254810a4c9b915cab1ac39f6174f7908";
+const GUEST_KEY = "$2a$10$LusbhRWHXFSOk5m.0MI1yeNSmkW6.0BreQaQtRF1niYqv8N4JwwYq";
+const USER_AGENT = "Mozilla/5.0 (Android 11; Mobile; rv:144.0) Gecko/144.0 Firefox/144.0";
 
 const BASE_HEADERS = {
   'Accept': 'application/json, text/plain, */*',
@@ -20,7 +24,12 @@ const BASE_HEADERS = {
   'x-language': 'ar',
   'x-auth-token': AUTH_TOKEN,
   'x-finger': FINGERPRINT,
-  'User-Agent': 'Mozilla/5.0 (Android 11; Mobile; rv:144.0) Gecko/144.0 Firefox/144.0',
+  'x-guest-key': GUEST_KEY,
+  'x-guset-key': GUEST_KEY,
+  'x-uuid': UUID,
+  'x-uid': UUID,
+  'x-user-id': String(USER_ID),
+  'User-Agent': USER_AGENT,
   'Origin': 'https://www.yollo.ai',
   'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`
 };
@@ -102,7 +111,13 @@ function extractFullReply(rawText, userMsg) {
 }
 
 app.get('/health', (req, res) => {
-  res.json({ status: "ok", botId: BOT_ID, sessionId: SESSION_ID });
+  res.json({
+    status: "ok",
+    botId: BOT_ID,
+    sessionId: SESSION_ID,
+    uuid: UUID,
+    hasAuthToken: Boolean(AUTH_TOKEN)
+  });
 });
 
 app.post('/api/chat', async (req, res) => {
@@ -119,6 +134,7 @@ app.post('/api/chat', async (req, res) => {
   const userMsg = message.trim();
 
   try {
+    // 1. إرسال الرسالة إلى /api/msg/send
     const sendRes = await fetch('https://www.yollo.ai/api/msg/send', {
       method: 'POST',
       headers: BASE_HEADERS,
@@ -129,30 +145,41 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const sendData = await sendRes.json().catch(() => ({}));
+    console.log("SEND_STATUS:", sendRes.status, "SEND_DATA:", JSON.stringify(sendData).slice(0, 500));
 
-    if (sendData && sendData.code && sendData.code !== 0 && sendData.code !== 200) {
+    if (!sendRes.ok || (sendData && sendData.code && sendData.code !== 0 && sendData.code !== 200)) {
       return res.json({
         ok: false,
-        reply: sendData.msg || sendData.message || JSON.stringify(sendData)
+        reply: sendData?.msg || sendData?.message || `فشل إرسال الرسالة (${sendRes.status})`
       });
     }
 
+    // إضافة رسالة المستخدم إلى السجل
     conversationHistory.push({
       role: "user",
       content: userMsg
     });
 
+    // 2. قراءة رد النموذج من /chat-stream
     const streamRes = await fetch('https://www.yollo.ai/chat-stream', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Android 11; Mobile; rv:144.0) Gecko/144.0 Firefox/144.0',
+        'x-auth-token': AUTH_TOKEN,
+        'x-finger': FINGERPRINT,
+        'x-guest-key': GUEST_KEY,
+        'x-guset-key': GUEST_KEY,
+        'x-uuid': UUID,
+        'x-uid': UUID,
+        'User-Agent': USER_AGENT,
         'Origin': 'https://www.yollo.ai',
         'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`
       },
       body: JSON.stringify({
         message: userMsg,
         sessionId: String(SESSION_ID),
+        uid: UUID,
+        userId: USER_ID,
         conversationHistory,
         userToken: AUTH_TOKEN,
         userLocale: "ar",
@@ -163,10 +190,11 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const rawStreamText = await readStreamResponse(streamRes);
-    console.log("STREAM_RAW:", rawStreamText.slice(0, 1500));
+    console.log("STREAM_STATUS:", streamRes.status, "STREAM_RAW:", rawStreamText.slice(0, 1500));
 
     const botReply = extractFullReply(rawStreamText, userMsg);
 
+    // 3. تسجيل الرد عبر /api/msg/callback وحفظه في السجل
     if (botReply) {
       conversationHistory.push({
         role: "assistant",
@@ -185,10 +213,11 @@ app.post('/api/chat', async (req, res) => {
     }
 
     res.json({
-      ok: true,
-      reply: botReply || "لم يرد البوت بنص جديد من البث؛ راجع سجل Render لمعرفة صيغة البث."
+      ok: Boolean(botReply),
+      reply: botReply || `لم يرد البوت بنص جديد (حالة البث: ${streamRes.status})؛ راجع سجلات Render.`
     });
   } catch (err) {
+    console.error("CHAT_ERROR:", err);
     res.status(500).json({
       ok: false,
       error: "تعذر الاتصال بخادم yollo.ai",
