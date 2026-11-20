@@ -43,22 +43,26 @@ const conversationHistory = [
 
 async function readStreamResponse(streamRes) {
   if (!streamRes.body || typeof streamRes.body.getReader !== "function") {
+    console.log("STREAM_READER: fallback to text()");
     return await streamRes.text();
   }
 
   const reader = streamRes.body.getReader();
   const decoder = new TextDecoder("utf-8");
   let fullRaw = "";
+  let chunkCount = 0;
 
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
     if (value) {
+      chunkCount += 1;
       fullRaw += decoder.decode(value, { stream: true });
     }
   }
 
   fullRaw += decoder.decode();
+  console.log("STREAM_CHUNKS_COUNT:", chunkCount, "TOTAL_LEN:", fullRaw.length);
   return fullRaw;
 }
 
@@ -134,7 +138,6 @@ app.post('/api/chat', async (req, res) => {
   const userMsg = message.trim();
 
   try {
-    // 1. إرسال الرسالة إلى /api/msg/send
     const sendRes = await fetch('https://www.yollo.ai/api/msg/send', {
       method: 'POST',
       headers: BASE_HEADERS,
@@ -147,54 +150,63 @@ app.post('/api/chat', async (req, res) => {
     const sendData = await sendRes.json().catch(() => ({}));
     console.log("SEND_STATUS:", sendRes.status, "SEND_DATA:", JSON.stringify(sendData).slice(0, 500));
 
-    if (!sendRes.ok || (sendData && sendData.code && sendData.code !== 0 && sendData.code !== 200)) {
+    if (!sendRes.ok || (sendData && sendData.code && sendData.code !== 0 && sendData.code !== 200 && sendData.code !== "200")) {
       return res.json({
         ok: false,
         reply: sendData?.msg || sendData?.message || `فشل إرسال الرسالة (${sendRes.status})`
       });
     }
 
-    // إضافة رسالة المستخدم إلى السجل
     conversationHistory.push({
       role: "user",
       content: userMsg
     });
 
-    // 2. قراءة رد النموذج من /chat-stream
-    const streamRes = await fetch('https://www.yollo.ai/chat-stream', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': AUTH_TOKEN,
-        'x-finger': FINGERPRINT,
-        'x-guest-key': GUEST_KEY,
-        'x-guset-key': GUEST_KEY,
-        'x-uuid': UUID,
-        'x-uid': UUID,
-        'User-Agent': USER_AGENT,
-        'Origin': 'https://www.yollo.ai',
-        'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`
-      },
-      body: JSON.stringify({
-        message: userMsg,
-        sessionId: String(SESSION_ID),
-        uid: UUID,
-        userId: USER_ID,
-        conversationHistory,
-        userToken: AUTH_TOKEN,
-        userLocale: "ar",
-        isRegenerate: false,
-        isSafeMode: false,
-        generateType: 0
-      })
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
+    console.log("CALLING_STREAM_START");
+
+    let streamRes;
+    try {
+      streamRes = await fetch('https://www.yollo.ai/chat-stream', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': AUTH_TOKEN,
+          'x-finger': FINGERPRINT,
+          'x-guest-key': GUEST_KEY,
+          'x-guset-key': GUEST_KEY,
+          'x-uuid': UUID,
+          'x-uid': UUID,
+          'User-Agent': USER_AGENT,
+          'Origin': 'https://www.yollo.ai',
+          'Referer': `https://www.yollo.ai/ar/chat/Cow-Girl-Emma-${BOT_ID}?sessionId=${SESSION_ID}`
+        },
+        body: JSON.stringify({
+          message: userMsg,
+          sessionId: String(SESSION_ID),
+          uid: UUID,
+          userId: USER_ID,
+          conversationHistory,
+          userToken: AUTH_TOKEN,
+          userLocale: "ar",
+          isRegenerate: false,
+          isSafeMode: false,
+          generateType: 0
+        })
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    console.log("STREAM_HEADERS_RECEIVED:", streamRes.status);
     const rawStreamText = await readStreamResponse(streamRes);
     console.log("STREAM_STATUS:", streamRes.status, "STREAM_RAW:", rawStreamText.slice(0, 1500));
 
     const botReply = extractFullReply(rawStreamText, userMsg);
 
-    // 3. تسجيل الرد عبر /api/msg/callback وحفظه في السجل
     if (botReply) {
       conversationHistory.push({
         role: "assistant",
@@ -214,13 +226,13 @@ app.post('/api/chat', async (req, res) => {
 
     res.json({
       ok: Boolean(botReply),
-      reply: botReply || `لم يرد البوت بنص جديد (حالة البث: ${streamRes.status})؛ راجع سجلات Render.`
+      reply: botReply || `تم إرسال الرسالة ولكن لم يظهر نص رد من /chat-stream (الحالة: ${streamRes.status}).`
     });
   } catch (err) {
-    console.error("CHAT_ERROR:", err);
+    console.error("CHAT_ERROR:", err?.name, err?.message, err?.cause || "");
     res.status(500).json({
       ok: false,
-      error: "تعذر الاتصال بخادم yollo.ai",
+      error: err?.name === "AbortError" ? "انتهت مهلة انتظار البث (60 ثانية)" : "تعذر الاتصال بخادم yollo.ai",
       details: err.message
     });
   }
