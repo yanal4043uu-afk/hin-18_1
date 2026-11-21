@@ -96,16 +96,11 @@
       animation: pulse 1s infinite;
     }
 
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
     .icon-btn {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      padding: 7px 10px;
+      padding: 7px 12px;
       border-radius: 8px;
       font-size: 12px;
       cursor: pointer;
@@ -118,7 +113,7 @@
 
     .icon-btn.danger {
       color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.35);
     }
 
     /* منطقة الرسائل */
@@ -135,7 +130,7 @@
     .msg-row {
       display: flex;
       flex-direction: column;
-      max-width: 86%;
+      max-width: 88%;
       animation: fadeIn 0.2s ease-out;
     }
 
@@ -150,7 +145,7 @@
     .bubble {
       padding: 12px 15px;
       border-radius: 16px;
-      line-height: 1.65;
+      line-height: 1.72;
       font-size: 14.5px;
       white-space: pre-wrap;
       word-wrap: break-word;
@@ -175,7 +170,7 @@
       color: #fca5a5;
     }
 
-    /* تنسيق تقمص الأدوار */
+    /* تنسيق تقمص الأدوار النظيف */
     .rp-action {
       color: var(--text-action);
       font-style: italic;
@@ -184,30 +179,6 @@
     .rp-quote {
       color: var(--text-quote);
       font-weight: 600;
-    }
-
-    .msg-footer {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 5px;
-      padding: 0 4px;
-    }
-
-    .tts-btn {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-action);
-      border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-
-    .tts-btn:hover {
-      color: #fff;
-      border-color: var(--accent);
     }
 
     /* مؤشر جاري الكتابة */
@@ -228,7 +199,7 @@
     .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
 
-    /* أزرار الردود السريعة */
+    /* شريط الأزرار السريعة الذكي */
     .quick-bar {
       display: flex;
       gap: 8px;
@@ -247,16 +218,18 @@
       background-color: var(--bg-input);
       border: 1px solid var(--border-color);
       color: #cbd5e1;
-      padding: 6px 12px;
+      padding: 7px 13px;
       border-radius: 999px;
       font-size: 12.5px;
       white-space: nowrap;
       cursor: pointer;
+      transition: 0.15s;
     }
 
     .chip:active {
       background-color: var(--accent);
       color: #fff;
+      border-color: var(--accent);
     }
 
     /* منطقة الإدخال */
@@ -306,60 +279,6 @@
       cursor: not-allowed;
     }
 
-    /* نافذة إعداد رابط السيرفر */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 50;
-    }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--bg-header);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 18px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .modal h2 {
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-
-    .modal p {
-      font-size: 12.5px;
-      color: var(--text-action);
-      margin-bottom: 12px;
-    }
-
-    .modal input {
-      width: 100%;
-      background: var(--bg-input);
-      border: 1px solid var(--border-color);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      direction: ltr;
-      margin-bottom: 14px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
     @keyframes bounce {
       0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
       40% { transform: scale(1); opacity: 1; }
@@ -389,60 +308,39 @@
         </div>
       </div>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="settingsBtn">⚙️ السيرفر</button>
+    <div>
       <button class="icon-btn danger" id="clearBtn">مسح</button>
     </div>
   </header>
 
   <main id="chatContainer"></main>
 
-  <div class="quick-bar">
-    <button class="chip" data-text="مرحبا">مرحبا</button>
-    <button class="chip" data-text="*ينظر حوله في المزرعة*">*ينظر حوله*</button>
-    <button class="chip" data-text="أخبريني عن المزرعة">عن المزرعة</button>
-    <button class="chip" data-text="نعم، بكل تأكيد">نعم</button>
-    <button class="chip" data-text="استمري">استمري</button>
-  </div>
+  <div class="quick-bar" id="quickBar"></div>
 
   <div class="input-area">
     <textarea id="msgInput" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
     <button id="sendBtn">إرسال</button>
   </div>
 
-  <!-- نافذة ضبط رابط Render -->
-  <div class="modal-backdrop" id="settingsModal">
-    <div class="modal">
-      <h2>رابط خادم المحادثة (Render)</h2>
-      <p>أدخل رابط السيرفر الأساسي بدون /api/chat في النهاية:</p>
-      <input type="url" id="apiUrlInput" placeholder="https://your-app.onrender.com" />
-      <div class="modal-actions">
-        <button class="icon-btn" id="closeModalBtn">إلغاء</button>
-        <button class="icon-btn" style="background: var(--accent); border-color: var(--accent);" id="saveApiBtn">حفظ</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // ضع رابط سيرفرك على Render هنا كقيمة افتراضية
-    const DEFAULT_API_BASE = "https://YOUR-RENDER-APP.onrender.com";
-    const STORAGE_KEY_CHAT = "yollo_custom_chat_v1";
-    const STORAGE_KEY_API = "yollo_custom_api_base";
+    const API_BASE_URL = "https://hin-18-1.onrender.com";
+    const STORAGE_KEY_CHAT = "yollo_custom_chat_v2";
+
+    const INITIAL_QUICK_REPLIES = [
+      { label: "مرحبا", text: "مرحبا" },
+      { label: "*ينظر حوله في المزرعة*", text: "*ينظر حوله في المزرعة*" },
+      { label: "أخبريني عن المزرعة", text: "أخبريني عن المزرعة" },
+      { label: "ما سر الكعك؟", text: "ما سر الكعك الذي تخبزينه؟" }
+    ];
 
     const chatContainer = document.getElementById("chatContainer");
     const msgInput = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
-
-    const settingsModal = document.getElementById("settingsModal");
-    const apiUrlInput = document.getElementById("apiUrlInput");
-    const settingsBtn = document.getElementById("settingsBtn");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const saveApiBtn = document.getElementById("saveApiBtn");
+    const quickBar = document.getElementById("quickBar");
     const clearBtn = document.getElementById("clearBtn");
 
-    let apiBaseUrl = localStorage.getItem(STORAGE_KEY_API) || DEFAULT_API_BASE;
     let messages = JSON.parse(localStorage.getItem(STORAGE_KEY_CHAT) || "[]");
     let isSending = false;
 
@@ -453,40 +351,76 @@
         .replace(/>/g, "&gt;");
     }
 
-    // تنسيق النجوم للحركات وعلامات التنصيص للحوار
+    // تنسيق آمن بدون أي تداخل مع علامات HTML
     function formatRoleplayText(rawText) {
-      let safe = escapeHtml(rawText);
-      safe = safe.replace(/\*([^*]+)\*/g, '<span class="rp-action">*$1*</span>');
-      safe = safe.replace(/"([^"]+)"/g, '<span class="rp-quote">"$1"</span>');
-      return safe;
+      const tokenRegex = /(\*[^*]+\*|"[^"]+"|“[^”]+”|«[^»]+»)/g;
+      const parts = rawText.split(tokenRegex);
+
+      return parts.map(part => {
+        if (!part) return "";
+        if (/^\*[^*]+\*$/.test(part)) {
+          return `<span class="rp-action">${escapeHtml(part)}</span>`;
+        }
+        if (/^("[^"]+"|“[^”]+”|«[^»]+»)$/.test(part)) {
+          return `<span class="rp-quote">${escapeHtml(part)}</span>`;
+        }
+        return escapeHtml(part);
+      }).join("");
     }
 
-    // استخراج النص المنطوق فقط (بدون الحركات بين النجمتين) للقراءة الصوتية
-    function extractSpokenText(rawText) {
-      return rawText
-        .replace(/\*[^*]+\*/g, " ")
-        .replace(/["«»]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
+    // توليد ردود سريعة ذكية بناءً على آخر رد للشخصية
+    function generateSmartQuickReplies(lastBotText) {
+      if (!lastBotText) return INITIAL_QUICK_REPLIES;
 
-    function speakText(text, btn) {
-      if (!("speechSynthesis" in window)) {
-        alert("متصفحك لا يدعم القراءة الصوتية.");
-        return;
+      const t = lastBotText.toLowerCase();
+
+      if (/كعك|خبز|مطبخ|طعام|أكل|مكون|سر|تذوق|جرب/.test(t)) {
+        return [
+          { label: "*يتذوق قطعة بحذر*", text: "*يتذوق قطعة صغيرة بحذر ويراقب رد فعلها*" },
+          { label: "ما المكون السري؟", text: "أخبريني، ما هو المكون السري في هذا الكعك؟" },
+          { label: "طعمه لذيذ فعلاً!", text: "طعمه لذيذ فعلاً! من أين تعلمتِ الخبز؟" },
+          { label: "*يبتسم*", text: "*يبتسم بهدوء ويجلس قريباً*" }
+        ];
       }
-      window.speechSynthesis.cancel();
-      const spoken = extractSpokenText(text) || text;
-      const utterance = new SpeechSynthesisUtterance(spoken);
-      utterance.lang = /[\u0600-\u06FF]/.test(spoken) ? "ar-SA" : "en-US";
-      utterance.rate = 1.0;
 
-      const originalLabel = btn.textContent;
-      btn.textContent = "🔊 جاري النطق...";
-      utterance.onend = () => { btn.textContent = originalLabel; };
-      utterance.onerror = () => { btn.textContent = originalLabel; };
+      if (/مزرع|أرض|حيوان|محصول|عمل|إصلاح|خراب|بيت/.test(t)) {
+        return [
+          { label: "كيف نصلح المزرعة؟", text: "برأيك من أين نبدأ لإصلاح هذه المزرعة؟" },
+          { label: "هل يوجد حيوانات هنا؟", text: "هل كان هناك أي حيوانات أو محاصيل قبل وصولي؟" },
+          { label: "*يتفقد المكان*", text: "*يتفقد أرجاء المنزل والمزرعة بتأنٍ*" },
+          { label: "سأساعدك", text: "لا تقلقي، سنعيد بناء هذا المكان معاً." }
+        ];
+      }
 
-      window.speechSynthesis.speak(utterance);
+      if (/\?|؟|هل|ماذا|كيف|لماذا|أين/.test(t)) {
+        return [
+          { label: "نعم، بالتأكيد", text: "نعم، بالتأكيد." },
+          { label: "لا، ليس بعد", text: "لا، ليس بعد، لكنني مستعد." },
+          { label: "أخبريني أكثر", text: "أخبريني أكثر عن ذلك." },
+          { label: "*يفكر قليلاً*", text: "*يفكر للحظة ثم يرد عليها*" }
+        ];
+      }
+
+      return [
+        { label: "استمري", text: "استمري." },
+        { label: "*يقترب منها*", text: "*يقترب منها بهدوء*" },
+        { label: "وماذا بعد؟", text: "وماذا بعد ذلك؟" },
+        { label: "*يستمع بانتباه*", text: "*يستمع إليها بانتباه*" }
+      ];
+    }
+
+    function renderQuickBar() {
+      const lastBotMsg = [...messages].reverse().find(m => m.role === "bot");
+      const suggestions = generateSmartQuickReplies(lastBotMsg ? lastBotMsg.content : "");
+
+      quickBar.innerHTML = "";
+      suggestions.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "chip";
+        btn.textContent = item.label;
+        btn.onclick = () => sendMessage(item.text);
+        quickBar.appendChild(btn);
+      });
     }
 
     function setTypingState(active) {
@@ -519,21 +453,8 @@
       }
 
       row.appendChild(bubble);
-
-      if (msg.role === "bot") {
-        const footer = document.createElement("div");
-        footer.className = "msg-footer";
-
-        const ttsBtn = document.createElement("button");
-        ttsBtn.className = "tts-btn";
-        ttsBtn.textContent = "🔊 استماع";
-        ttsBtn.onclick = () => speakText(msg.content, ttsBtn);
-
-        footer.appendChild(ttsBtn);
-        row.appendChild(footer);
-      }
-
       chatContainer.appendChild(row);
+
       if (shouldScroll) {
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
@@ -543,6 +464,7 @@
       chatContainer.innerHTML = "";
       messages.forEach(m => renderMessage(m, false));
       chatContainer.scrollTop = chatContainer.scrollHeight;
+      renderQuickBar();
     }
 
     function showTypingBubble() {
@@ -567,12 +489,6 @@
       const text = (customText ?? msgInput.value).trim();
       if (!text || isSending) return;
 
-      if (apiBaseUrl.includes("YOUR-RENDER-APP")) {
-        settingsModal.classList.add("open");
-        apiUrlInput.focus();
-        return;
-      }
-
       const userMsg = { role: "user", content: text };
       messages.push(userMsg);
       saveMessages();
@@ -584,7 +500,7 @@
       showTypingBubble();
 
       try {
-        const endpoint = `${apiBaseUrl.replace(/\/+$/, "")}/api/chat`;
+        const endpoint = `${API_BASE_URL.replace(/\/+$/, "")}/api/chat`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -602,19 +518,19 @@
           messages.push(botMsg);
           saveMessages();
           renderMessage(botMsg);
+          renderQuickBar();
         }
       } catch (err) {
         removeTypingBubble();
         renderMessage({
           role: "error",
-          content: "تعذر الوصول إلى السيرفر. تأكد من رابط Render أو أن الخادم نشط."
+          content: "تعذر الوصول إلى السيرفر. تأكد من أن خادم Render نشط."
         });
       } finally {
         setTypingState(false);
       }
     }
 
-    // ضبط ارتفاع مربع النص تلقائياً
     msgInput.addEventListener("input", () => {
       msgInput.style.height = "44px";
       msgInput.style.height = Math.min(msgInput.scrollHeight, 110) + "px";
@@ -628,30 +544,6 @@
     });
 
     sendBtn.addEventListener("click", () => sendMessage());
-
-    document.querySelectorAll(".chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        sendMessage(chip.dataset.text);
-      });
-    });
-
-    settingsBtn.addEventListener("click", () => {
-      apiUrlInput.value = apiBaseUrl.includes("YOUR-RENDER-APP") ? "" : apiBaseUrl;
-      settingsModal.classList.add("open");
-    });
-
-    closeModalBtn.addEventListener("click", () => {
-      settingsModal.classList.remove("open");
-    });
-
-    saveApiBtn.addEventListener("click", () => {
-      const val = apiUrlInput.value.trim();
-      if (val) {
-        apiBaseUrl = val.replace(/\/+$/, "");
-        localStorage.setItem(STORAGE_KEY_API, apiBaseUrl);
-        settingsModal.classList.remove("open");
-      }
-    });
 
     clearBtn.addEventListener("click", () => {
       if (confirm("هل تريد مسح سجل المحادثة من الشاشة؟")) {
