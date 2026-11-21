@@ -89,7 +89,7 @@
       top: 0;
       right: 0;
       bottom: 0;
-      width: min(300px, 85vw);
+      width: min(310px, 86vw);
       background-color: var(--bg-sidebar);
       border-left: 1px solid var(--border-strong);
       transform: translateX(105%);
@@ -170,6 +170,9 @@
       color: var(--text-action);
       padding: 0 6px;
       margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .drawer-nav-list {
@@ -257,36 +260,54 @@
       line-height: 1.5;
     }
 
-    /* المحادثات النشطة داخل القائمة */
+    /* سجل المحادثات النشطة وقائمة الثلاث نقاط */
     .recent-chat-item {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border-color);
       cursor: pointer;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       transition: 0.15s;
     }
 
-    .recent-chat-item:hover {
-      border-color: var(--border-strong);
+    .recent-chat-item.pinned {
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      background: color-mix(in srgb, var(--accent) 8%, rgba(255, 255, 255, 0.02));
     }
 
-    .recent-chat-item img {
-      width: 36px;
-      height: 36px;
+    .recent-chat-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .recent-chat-main img {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       object-fit: cover;
       object-position: top center;
       flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .recent-chat-meta {
       min-width: 0;
       flex: 1;
+    }
+
+    .recent-chat-title-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .recent-chat-meta h4 {
@@ -303,6 +324,75 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .dots-menu-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .dots-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* القائمة المنسدلة للثلاث نقاط */
+    .chat-context-menu {
+      position: fixed;
+      background: #141c2c;
+      border: 1px solid var(--border-strong);
+      border-radius: 13px;
+      padding: 6px;
+      min-width: 195px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75);
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .chat-context-menu.open {
+      display: flex;
+    }
+
+    .context-action-btn {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #f3f4f6;
+      padding: 9px 11px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-align: right;
+    }
+
+    .context-action-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .context-action-btn.danger-action {
+      color: #fca5a5;
+    }
+
+    .context-action-btn.danger-action:hover {
+      background: rgba(239, 68, 68, 0.15);
     }
 
     /* ==================== 1. الواجهة الرئيسية (Lobby) ==================== */
@@ -469,29 +559,22 @@
     }
 
     .active-chat-dot {
-      background: rgba(16, 185, 129, 0.88);
+      background: rgba(16, 185, 129, 0.9);
       color: #fff;
       font-size: 10px;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 999px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
     }
 
-    .delete-custom-btn {
-      pointer-events: auto;
-      background: rgba(15, 20, 31, 0.82);
-      border: 1px solid rgba(239, 68, 68, 0.45);
-      color: #fca5a5;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: auto;
+    .lock-badge {
+      background: rgba(15, 20, 31, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fbbf24;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
     }
 
     .card-media {
@@ -698,7 +781,7 @@
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      padding: 6px 10px;
+      padding: 6px 11px;
       border-radius: 9px;
       font-size: 12px;
       cursor: pointer;
@@ -1063,9 +1146,6 @@
     .modal h2 {
       font-size: 16px;
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
     }
 
     .modal label {
@@ -1085,27 +1165,6 @@
       border-radius: 9px;
       font-size: 13px;
       min-height: 38px;
-    }
-
-    .advanced-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .advanced-box summary {
-      font-size: 12px;
-      color: #a5b4fc;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .modal-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
     }
 
     .modal-actions {
@@ -1327,11 +1386,22 @@
       </div>
 
       <div>
-        <div class="drawer-section-title">سجل المحادثات النشطة</div>
+        <div class="drawer-section-title">
+          <span>سجل المحادثات النشطة</span>
+          <span id="activeChatsCountLabel" style="color:#a5b4fc;">0</span>
+        </div>
         <div id="drawerRecentList"></div>
       </div>
     </div>
   </aside>
+
+  <!-- قائمة خيارات الثلاث نقاط للمحادثة النشطة -->
+  <div class="chat-context-menu" id="chatContextMenu">
+    <button class="context-action-btn" id="ctxPinBtn">📌 تثبيت المحادثة</button>
+    <button class="context-action-btn" id="ctxLockBtn">🔒 قفل بكلمة سر</button>
+    <button class="context-action-btn" id="ctxEditBtn">✏️ تعديل الشخصية</button>
+    <button class="context-action-btn danger-action" id="ctxDeleteBtn">🗑️ حذف السجل نهائياً</button>
+  </div>
 
   <!-- ==================== 1. الواجهة الرئيسية ==================== -->
   <section id="homeView" class="view active">
@@ -1383,7 +1453,6 @@
         </div>
       </div>
       <div class="header-controls">
-        <button class="icon-btn" id="editCurrentBotBtn" title="تعديل تفاصيل الشخصية">✏️ تعديل</button>
         <button class="icon-btn danger" id="clearBtn">مسح</button>
       </div>
     </header>
@@ -1404,7 +1473,7 @@
     </div>
   </section>
 
-  <!-- ==================== نافذة معاينة الشخصية (تظهر فقط لأول مرة) ==================== -->
+  <!-- ==================== نافذة معاينة الشخصية (تظهر فقط قبل بدء الجلسة) ==================== -->
   <div class="modal-backdrop bottom-sheet" id="previewModal">
     <div class="modal">
       <div class="preview-top">
@@ -1422,7 +1491,7 @@
     </div>
   </div>
 
-  <!-- ==================== نافذة إنشاء / تعديل الشخصية الكاملة ==================== -->
+  <!-- ==================== نافذة إنشاء / تعديل الشخصية (بدون أي إعدادات ربط) ==================== -->
   <div class="modal-backdrop" id="botEditorModal">
     <div class="modal">
       <h2 id="botEditorTitle">✨ إنشاء شخصية جديدة</h2>
@@ -1447,23 +1516,24 @@
         <button type="button" class="toggle-pill on" id="editorWelcomeImgToggle">مفعّل</button>
       </div>
 
-      <details class="advanced-box">
-        <summary>إعدادات الربط المتقدمة (Bot ID / Session ID)</summary>
-        <div class="modal-row">
-          <div>
-            <label>Bot ID</label>
-            <input type="number" id="editorBotId" value="148005" dir="ltr" />
-          </div>
-          <div>
-            <label>Session ID</label>
-            <input type="number" id="editorSessionId" value="21702378" dir="ltr" />
-          </div>
-        </div>
-      </details>
-
       <div class="modal-actions">
         <button class="icon-btn" id="cancelBotEditorBtn">إلغاء</button>
         <button class="icon-btn" style="background: var(--accent); border-color: var(--accent);" id="saveBotEditorBtn">حفظ الشخصية</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة قفل/فتح المحادثة بكلمة سر ==================== -->
+  <div class="modal-backdrop" id="lockModal">
+    <div class="modal">
+      <h2 id="lockModalTitle">🔒 قفل المحادثة بكلمة سر</h2>
+      <p id="lockModalDesc" style="font-size:12.5px; color:var(--text-action);">أدخل كلمة سر لحماية هذه المحادثة:</p>
+      <div>
+        <input type="password" id="lockPasswordInput" placeholder="أدخل كلمة السر..." />
+      </div>
+      <div class="modal-actions">
+        <button class="icon-btn" id="cancelLockBtn">إلغاء</button>
+        <button class="icon-btn" style="background: var(--accent); border-color: var(--accent);" id="confirmLockBtn">تأكيد</button>
       </div>
     </div>
   </div>
@@ -1548,11 +1618,15 @@
   </div>
 
   <script>
+    // إعدادات الاتصال الداخلية المخفية تماماً عن الواجهة
     const API_BASE_URL = "https://hin-18-1.onrender.com";
+    const INTERNAL_BOT_ID = 148005;
+    const INTERNAL_SESSION_ID = 21702378;
     const FALLBACK_AVATAR = "https://d.top4top.io/p_39776f6w21.jpg";
 
-    const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v3";
-    const STORAGE_KEY_BOT_OVERRIDES = "yollo_default_bot_overrides_v1";
+    const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v4";
+    const STORAGE_KEY_BOT_OVERRIDES = "yollo_default_bot_overrides_v2";
+    const STORAGE_KEY_CHAT_META = "yollo_active_chats_meta_v1"; // { [botId]: { started: true, pinned: false, password: "" } }
     const STORAGE_KEY_PERSONA = "yollo_user_persona_v1";
     const STORAGE_KEY_PREFS = "yollo_ui_preferences_v2";
 
@@ -1573,8 +1647,6 @@
     const DEFAULT_BOTS = [
       {
         id: "bot_148005",
-        botId: 148005,
-        sessionId: 21702378,
         name: "Cow Girl Emma",
         avatarUrl: "https://d.top4top.io/p_39776f6w21.jpg",
         chatsCount: "4.0m",
@@ -1601,12 +1673,28 @@
     const closeDrawerBtn = document.getElementById("closeDrawerBtn");
     const drawerStatsText = document.getElementById("drawerStatsText");
     const customCountBadge = document.getElementById("customCountBadge");
+    const activeChatsCountLabel = document.getElementById("activeChatsCountLabel");
     const drawerRecentList = document.getElementById("drawerRecentList");
 
     const navCreateBotBtn = document.getElementById("navCreateBotBtn");
     const navHomeBtn = document.getElementById("navHomeBtn");
     const navCustomBtn = document.getElementById("navCustomBtn");
     const navSettingsBtn = document.getElementById("navSettingsBtn");
+
+    // قائمة خيارات الثلاث نقاط
+    const chatContextMenu = document.getElementById("chatContextMenu");
+    const ctxPinBtn = document.getElementById("ctxPinBtn");
+    const ctxLockBtn = document.getElementById("ctxLockBtn");
+    const ctxEditBtn = document.getElementById("ctxEditBtn");
+    const ctxDeleteBtn = document.getElementById("ctxDeleteBtn");
+
+    // نافذة كلمة السر
+    const lockModal = document.getElementById("lockModal");
+    const lockModalTitle = document.getElementById("lockModalTitle");
+    const lockModalDesc = document.getElementById("lockModalDesc");
+    const lockPasswordInput = document.getElementById("lockPasswordInput");
+    const cancelLockBtn = document.getElementById("cancelLockBtn");
+    const confirmLockBtn = document.getElementById("confirmLockBtn");
 
     // عناصر البيرسونا
     const personaDisplayName = document.getElementById("personaDisplayName");
@@ -1646,7 +1734,6 @@
     const statusText = document.getElementById("statusText");
     const quickBar = document.getElementById("quickBar");
     const formatToolbar = document.getElementById("formatToolbar");
-    const editCurrentBotBtn = document.getElementById("editCurrentBotBtn");
     const clearBtn = document.getElementById("clearBtn");
 
     // عناصر معاينة الشخصية ومحرر الشخصيات
@@ -1667,7 +1754,9 @@
     let activeCategory = "all";
     let currentBot = null;
     let previewingBot = null;
-    let editingBotTarget = null; // null = إنشاء شخصية جديدة، أو كائن الشخصية = تعديل كامل
+    let editingBotTarget = null;
+    let contextMenuBot = null;
+    let lockActionState = null; // { mode: 'set' | 'unlock_open' | 'remove', bot }
     let editorSendWelcomeImg = false;
 
     let messages = [];
@@ -1780,6 +1869,39 @@
       } catch {}
     }
 
+    // ==================== إدارة بيانات الجلسات النشطة (تثبيت / قفل / بدء) ====================
+    function getAllChatMeta() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_CHAT_META) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function getBotChatMeta(botId) {
+      const all = getAllChatMeta();
+      return all[botId] || { started: false, pinned: false, password: "" };
+    }
+
+    function updateBotChatMeta(botId, patch) {
+      const all = getAllChatMeta();
+      all[botId] = { ...getBotChatMeta(botId), ...patch };
+      localStorage.setItem(STORAGE_KEY_CHAT_META, JSON.stringify(all));
+    }
+
+    function removeBotChatMeta(botId) {
+      const all = getAllChatMeta();
+      delete all[botId];
+      localStorage.setItem(STORAGE_KEY_CHAT_META, JSON.stringify(all));
+    }
+
+    function isChatActive(bot) {
+      const meta = getBotChatMeta(bot.id);
+      if (meta.started) return true;
+      const msgs = loadBotMessages(bot);
+      return msgs.some(m => m.role === "user");
+    }
+
     // ==================== إدارة الشخصيات والتعديلات ====================
     function getBotOverrides() {
       try {
@@ -1838,7 +1960,141 @@
       personaModal.classList.remove("open");
     });
 
-    // ==================== القائمة الجانبية والإعدادات ====================
+    // ==================== القائمة الجانبية وقائمة الثلاث نقاط ====================
+    function closeContextMenu() {
+      chatContextMenu.classList.remove("open");
+      contextMenuBot = null;
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#chatContextMenu") && !e.target.closest(".dots-menu-btn")) {
+        closeContextMenu();
+      }
+    });
+
+    function openContextMenu(e, bot) {
+      e.stopPropagation();
+      contextMenuBot = bot;
+      const meta = getBotChatMeta(bot.id);
+
+      ctxPinBtn.textContent = meta.pinned ? "📌 إلغاء التثبيت" : "📌 تثبيت المحادثة";
+      ctxLockBtn.textContent = meta.password ? "🔓 إلغاء قفل كلمة السر" : "🔒 قفل المحادثة بكلمة سر";
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      chatContextMenu.classList.add("open");
+      const menuWidth = chatContextMenu.offsetWidth || 195;
+      const menuHeight = chatContextMenu.offsetHeight || 160;
+
+      let left = Math.max(10, Math.min(rect.left, window.innerWidth - menuWidth - 10));
+      let top = rect.bottom + 4;
+      if (top + menuHeight > window.innerHeight - 10) {
+        top = Math.max(10, rect.top - menuHeight - 4);
+      }
+
+      chatContextMenu.style.left = `${left}px`;
+      chatContextMenu.style.top = `${top}px`;
+    }
+
+    ctxPinBtn.addEventListener("click", () => {
+      if (!contextMenuBot) return;
+      const meta = getBotChatMeta(contextMenuBot.id);
+      updateBotChatMeta(contextMenuBot.id, { pinned: !meta.pinned });
+      closeContextMenu();
+      updateDrawerContent();
+    });
+
+    ctxLockBtn.addEventListener("click", () => {
+      if (!contextMenuBot) return;
+      const bot = contextMenuBot;
+      const meta = getBotChatMeta(bot.id);
+      closeContextMenu();
+      closeDrawer();
+
+      if (meta.password) {
+        lockActionState = { mode: "remove", bot };
+        lockModalTitle.textContent = "🔓 إلغاء قفل المحادثة";
+        lockModalDesc.textContent = `أدخل كلمة السر الحالية لإلغاء قفل محادثة "${bot.name}":`;
+      } else {
+        lockActionState = { mode: "set", bot };
+        lockModalTitle.textContent = "🔒 قفل المحادثة بكلمة سر";
+        lockModalDesc.textContent = `اختر كلمة سر لقفل محادثة "${bot.name}":`;
+      }
+      lockPasswordInput.value = "";
+      lockModal.classList.add("open");
+      lockPasswordInput.focus();
+    });
+
+    ctxEditBtn.addEventListener("click", () => {
+      if (!contextMenuBot) return;
+      const bot = contextMenuBot;
+      closeContextMenu();
+      closeDrawer();
+      openBotEditor(bot);
+    });
+
+    ctxDeleteBtn.addEventListener("click", () => {
+      if (!contextMenuBot) return;
+      const bot = contextMenuBot;
+      closeContextMenu();
+
+      if (confirm(`هل تريد حذف سجل محادثة "${bot.name}" بشكل نهائي؟`)) {
+        localStorage.removeItem(getStorageKey(bot));
+        removeBotChatMeta(bot.id);
+
+        if (currentBot && currentBot.id === bot.id) {
+          currentBot = null;
+          chatView.classList.remove("active");
+          homeView.classList.add("active");
+        }
+        updateDrawerContent();
+        renderBotsGrid();
+      }
+    });
+
+    // منطق نافذة كلمة السر
+    cancelLockBtn.addEventListener("click", () => {
+      lockModal.classList.remove("open");
+      lockActionState = null;
+    });
+
+    confirmLockBtn.addEventListener("click", () => {
+      if (!lockActionState) return;
+      const pass = lockPasswordInput.value.trim();
+      const { mode, bot } = lockActionState;
+      const meta = getBotChatMeta(bot.id);
+
+      if (!pass) {
+        alert("يرجى إدخال كلمة السر.");
+        return;
+      }
+
+      if (mode === "set") {
+        updateBotChatMeta(bot.id, { password: pass });
+        lockModal.classList.remove("open");
+        lockActionState = null;
+        renderBotsGrid();
+        alert(`تم قفل محادثة "${bot.name}" بكلمة سر بنجاح.`);
+      } else if (mode === "remove") {
+        if (pass !== meta.password) {
+          alert("كلمة السر غير صحيحة!");
+          return;
+        }
+        updateBotChatMeta(bot.id, { password: "" });
+        lockModal.classList.remove("open");
+        lockActionState = null;
+        renderBotsGrid();
+        alert("تم إلغاء قفل المحادثة.");
+      } else if (mode === "unlock_open") {
+        if (pass !== meta.password) {
+          alert("كلمة السر غير صحيحة!");
+          return;
+        }
+        lockModal.classList.remove("open");
+        lockActionState = null;
+        proceedOpenBotChat(bot);
+      }
+    });
+
     function openDrawer() {
       updatePersonaUI();
       updateDrawerContent();
@@ -1847,6 +2103,7 @@
     }
 
     function closeDrawer() {
+      closeContextMenu();
       drawerBackdrop.classList.remove("open");
       sidebarDrawer.classList.remove("open");
     }
@@ -1858,33 +2115,55 @@
       customCountBadge.textContent = String(customCount);
 
       drawerRecentList.innerHTML = "";
-      let activeChatsCount = 0;
 
-      allBots.forEach(bot => {
+      // تصفية وترتيب المحادثات النشطة (المثبتة أولاً)
+      const activeBots = allBots
+        .filter(bot => isChatActive(bot))
+        .sort((a, b) => {
+          const pinA = getBotChatMeta(a.id).pinned ? 1 : 0;
+          const pinB = getBotChatMeta(b.id).pinned ? 1 : 0;
+          return pinB - pinA;
+        });
+
+      activeChatsCountLabel.textContent = String(activeBots.length);
+
+      activeBots.forEach(bot => {
+        const meta = getBotChatMeta(bot.id);
         const botMsgs = loadBotMessages(bot);
-        const hasUserMsg = botMsgs.some(m => m.role === "user");
-        if (!hasUserMsg) return;
+        const lastTxt = [...botMsgs].reverse().find(m => m.content)?.content.replace(/\*/g, "") || "محادثة نشطة";
+        const previewText = meta.password ? "🔒 محادثة مقفلة بكلمة سر" : lastTxt;
 
-        activeChatsCount++;
-        const lastTxt = [...botMsgs].reverse().find(m => m.content)?.content.replace(/\*/g, "") || "";
         const item = document.createElement("div");
-        item.className = "recent-chat-item";
+        item.className = `recent-chat-item ${meta.pinned ? "pinned" : ""}`;
         item.innerHTML = `
-          <img src="${bot.avatarUrl}" onerror="this.src='${FALLBACK_AVATAR}'" alt="${escapeHtml(bot.name)}" />
-          <div class="recent-chat-meta">
-            <h4>${escapeHtml(bot.name)}</h4>
-            <p>${escapeHtml(lastTxt)}</p>
+          <div class="recent-chat-main">
+            <img src="${bot.avatarUrl}" onerror="this.src='${FALLBACK_AVATAR}'" alt="${escapeHtml(bot.name)}" />
+            <div class="recent-chat-meta">
+              <div class="recent-chat-title-row">
+                ${meta.pinned ? `<span title="مثبت">📌</span>` : ""}
+                ${meta.password ? `<span title="مقفل">🔒</span>` : ""}
+                <h4>${escapeHtml(bot.name)}</h4>
+              </div>
+              <p>${escapeHtml(previewText)}</p>
+            </div>
           </div>
+          <button type="button" class="dots-menu-btn" title="خيارات المحادثة">⋮</button>
         `;
-        item.onclick = () => {
+
+        item.querySelector(".recent-chat-main").onclick = () => {
           closeDrawer();
-          openBotChat(bot);
+          requestOpenBotChat(bot);
         };
+
+        item.querySelector(".dots-menu-btn").onclick = (e) => {
+          openContextMenu(e, bot);
+        };
+
         drawerRecentList.appendChild(item);
       });
 
-      if (activeChatsCount === 0) {
-        drawerRecentList.innerHTML = `<p style="font-size:12px; color:var(--text-action); padding:4px 6px;">لا توجد محادثات نشطة بعد.</p>`;
+      if (activeBots.length === 0) {
+        drawerRecentList.innerHTML = `<p style="font-size:12px; color:var(--text-action); padding:4px 6px;">لا توجد محادثات نشطة بعد. اختر شخصية واضغط "ابدأ المحادثة الآن".</p>`;
       }
     }
 
@@ -1931,6 +2210,7 @@
       const backup = {
         persona: loadPersona(),
         overrides: getBotOverrides(),
+        chatMeta: getAllChatMeta(),
         customBots: getAllBots().filter(b => b.isCustom),
         chats: {}
       };
@@ -1955,7 +2235,7 @@
       }
     });
 
-    // ==================== محرر إنشاء وتعديل الشخصية بالكامل ====================
+    // ==================== محرر إنشاء وتعديل الشخصية (بدون إعدادات ربط) ====================
     function updateEditorWelcomeToggleUI() {
       editorWelcomeImgToggle.textContent = editorSendWelcomeImg ? "مفعّل" : "مخفي";
       editorWelcomeImgToggle.classList.toggle("on", editorSendWelcomeImg);
@@ -1974,8 +2254,6 @@
         document.getElementById("editorBotAvatar").value = botToEdit.avatarUrl || "";
         document.getElementById("editorBotBio").value = botToEdit.bio || "";
         document.getElementById("editorBotGreeting").value = botToEdit.greeting || "";
-        document.getElementById("editorBotId").value = botToEdit.botId || 148005;
-        document.getElementById("editorSessionId").value = botToEdit.sessionId || 21702378;
         editorSendWelcomeImg = Boolean(botToEdit.sendWelcomeImage);
       } else {
         botEditorTitle.textContent = "✨ إنشاء شخصية جديدة";
@@ -1983,17 +2261,11 @@
         document.getElementById("editorBotAvatar").value = "";
         document.getElementById("editorBotBio").value = "";
         document.getElementById("editorBotGreeting").value = "";
-        document.getElementById("editorBotId").value = "148005";
-        document.getElementById("editorSessionId").value = "21702378";
         editorSendWelcomeImg = false;
       }
       updateEditorWelcomeToggleUI();
       botEditorModal.classList.add("open");
     }
-
-    editCurrentBotBtn.addEventListener("click", () => {
-      if (currentBot) openBotEditor(currentBot);
-    });
 
     cancelBotEditorBtn.addEventListener("click", () => {
       botEditorModal.classList.remove("open");
@@ -2004,8 +2276,6 @@
       const avatarUrl = document.getElementById("editorBotAvatar").value.trim() || FALLBACK_AVATAR;
       const bio = document.getElementById("editorBotBio").value.trim() || "شخصية تفاعلية مخصصة.";
       const greeting = document.getElementById("editorBotGreeting").value.trim() || "*تبتسم وتنظر إليك*\n“أهلاً بك!”";
-      const botId = Number(document.getElementById("editorBotId").value.trim()) || 148005;
-      const sessionId = Number(document.getElementById("editorSessionId").value.trim()) || 21702378;
 
       if (!name) {
         alert("يرجى إدخال اسم الشخصية.");
@@ -2018,8 +2288,6 @@
           avatarUrl,
           bio,
           greeting,
-          botId,
-          sessionId,
           sendWelcomeImage: editorSendWelcomeImg
         };
 
@@ -2038,25 +2306,20 @@
         botEditorModal.classList.remove("open");
 
         if (currentBot && refreshedBot && currentBot.id === refreshedBot.id) {
-          // تحديث الرسالة الافتتاحية الأولى في السجل إذا لم تُحذف
           if (messages.length > 0 && messages[0].role === "bot" && messages[0].type === "text") {
             messages[0].content = refreshedBot.greeting;
             messages[0].ltr = /[a-zA-Z]{10,}/.test(refreshedBot.greeting) && !/[\u0600-\u06FF]/.test(refreshedBot.greeting);
           }
-          if (refreshedBot.sendWelcomeImage) {
-            if (messages.length > 1 && messages[1].type === "image") {
-              messages[1].imageUrl = refreshedBot.avatarUrl;
-            }
+          if (refreshedBot.sendWelcomeImage && messages.length > 1 && messages[1].type === "image") {
+            messages[1].imageUrl = refreshedBot.avatarUrl;
           }
           saveMessages();
-          openBotChat(refreshedBot);
+          proceedOpenBotChat(refreshedBot);
         }
         renderBotsGrid();
       } else {
         const newBot = {
           id: `custom_${Date.now()}`,
-          botId,
-          sessionId,
           name,
           avatarUrl,
           chatsCount: "جديد",
@@ -2078,7 +2341,6 @@
         localStorage.setItem(STORAGE_KEY_CUSTOM_BOTS, JSON.stringify(customList));
         botEditorModal.classList.remove("open");
         renderBotsGrid();
-        openBotChat(newBot);
       }
     });
 
@@ -2107,15 +2369,15 @@
       }
 
       filteredBots.forEach(bot => {
-        const savedMsgs = loadBotMessages(bot);
-        const hasHistory = savedMsgs.some(m => m.role === "user");
+        const active = isChatActive(bot);
+        const meta = getBotChatMeta(bot.id);
 
         const card = document.createElement("div");
         card.className = "bot-card";
         card.innerHTML = `
           <div class="card-top-badges">
-            ${hasHistory ? `<span class="active-chat-dot">نشط</span>` : `<span></span>`}
-            ${bot.isCustom ? `<button class="delete-custom-btn" title="حذف الشخصية">✕</button>` : ""}
+            ${active ? `<span class="active-chat-dot">نشط</span>` : `<span></span>`}
+            ${meta.password ? `<span class="lock-badge">🔒</span>` : `<span></span>`}
           </div>
           <div class="card-media">
             <img src="${bot.avatarUrl}" onerror="this.src='${FALLBACK_AVATAR}'" alt="${escapeHtml(bot.name)}" loading="lazy" />
@@ -2130,22 +2392,10 @@
           </div>
         `;
 
-        if (bot.isCustom) {
-          card.querySelector(".delete-custom-btn").onclick = (e) => {
-            e.stopPropagation();
-            if (confirm(`حذف شخصية "${bot.name}"؟`)) {
-              const updated = getAllBots().filter(b => b.isCustom && b.id !== bot.id);
-              localStorage.setItem(STORAGE_KEY_CUSTOM_BOTS, JSON.stringify(updated));
-              localStorage.removeItem(getStorageKey(bot));
-              renderBotsGrid();
-            }
-          };
-        }
-
-        // إذا كانت المحادثة بدأت مسبقاً -> ادخل فوراً بدون إظهار نافذة المعاينة
+        // إذا كانت الجلسة نشطة مسبقاً -> ينقلك فوراً للمحادثة بدون معاينة
         card.onclick = () => {
-          if (hasHistory) {
-            openBotChat(bot);
+          if (active) {
+            requestOpenBotChat(bot);
           } else {
             openPreviewSheet(bot);
           }
@@ -2173,10 +2423,17 @@
       if (e.target === previewModal) previewModal.classList.remove("open");
     });
 
+    // عند الضغط على "ابدأ المحادثة الآن": تُفعّل الجلسة فوراً وتُحفظ في سجل المحادثات النشطة
     startChatNowBtn.addEventListener("click", () => {
       if (!previewingBot) return;
+      const bot = previewingBot;
       previewModal.classList.remove("open");
-      openBotChat(previewingBot);
+
+      updateBotChatMeta(bot.id, { started: true });
+      const initialMsgs = loadBotMessages(bot);
+      localStorage.setItem(getStorageKey(bot), JSON.stringify(initialMsgs));
+
+      requestOpenBotChat(bot);
     });
 
     categoryTabs.querySelectorAll(".filter-pill").forEach(btn => {
@@ -2231,8 +2488,24 @@
       localStorage.setItem(getStorageKey(currentBot), JSON.stringify(messages));
     }
 
-    function openBotChat(bot) {
+    function requestOpenBotChat(bot) {
+      const meta = getBotChatMeta(bot.id);
+      if (meta.password) {
+        lockActionState = { mode: "unlock_open", bot };
+        lockModalTitle.textContent = `🔒 محادثة "${bot.name}" مقفلة`;
+        lockModalDesc.textContent = "أدخل كلمة السر لفتح المحادثة:";
+        lockPasswordInput.value = "";
+        lockModal.classList.add("open");
+        lockPasswordInput.focus();
+        return;
+      }
+      proceedOpenBotChat(bot);
+    }
+
+    function proceedOpenBotChat(bot) {
       currentBot = bot;
+      updateBotChatMeta(bot.id, { started: true });
+
       chatHeaderAvatar.src = bot.avatarUrl;
       chatHeaderAvatar.onerror = () => { chatHeaderAvatar.src = FALLBACK_AVATAR; };
       chatHeaderAvatar.alt = bot.name;
@@ -2567,8 +2840,8 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: buildPayloadMessage(userText),
-            botId: currentBot.botId,
-            sessionId: currentBot.sessionId
+            botId: INTERNAL_BOT_ID,
+            sessionId: INTERNAL_SESSION_ID
           })
         });
 
