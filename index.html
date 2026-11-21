@@ -2934,15 +2934,15 @@
       if (!currentBot) return rawUserText;
       const p = getBotPersona(currentBot.id);
       const parts = [
-        p.name ? `اسم الشخص الذي تتحدثين معه هو "${p.name}" (أنتِ تعرفين اسمه مسبقاً وناديه به في الحوار)` : "",
-        p.title ? `صفته: ${p.title}` : "",
-        p.appearance ? `مظهره: ${p.appearance}` : "",
-        p.tone ? `طبعه وأسلوبه: ${p.tone}` : "",
-        p.bio ? `معلومات إضافية عنه: ${p.bio}` : ""
+        p.name ? `اسمي: ${p.name}` : "",
+        p.title ? `لقبي/صفتي: ${p.title}` : "",
+        p.appearance ? `مظهري/عمري: ${p.appearance}` : "",
+        p.tone ? `أسلوب تعاملي: ${p.tone}` : "",
+        p.bio ? `خلفيتي: ${p.bio}` : ""
       ].filter(Boolean);
 
       if (parts.length === 0) return rawUserText;
-      return `(ملاحظة سياق للشخصية - التزمي بها في ردودك: ${parts.join("، ")})\n${rawUserText}`;
+      return `[هوية المستخدم في القصة: ${parts.join(" | ")}]\n${rawUserText}`;
     }
 
     async function regenerateLastReply() {
@@ -2997,7 +2997,6 @@
         } else {
           playUiPop(440);
 
-          // حفظ serverId لرسالة المستخدم الأخيرة إن وُجد
           if (data.userMsgId) {
             for (let i = messages.length - 1; i >= 0; i--) {
               if (messages[i].role === "user") {
