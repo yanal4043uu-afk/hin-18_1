@@ -1365,7 +1365,7 @@
 </head>
 <body>
 
-  <!-- ==================== القائمة الجانبية (نظيفة ومتناسقة) ==================== -->
+  <!-- ==================== القائمة الجانبية ==================== -->
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="drawer-top">
@@ -1666,7 +1666,40 @@
     const STORAGE_KEY_CHAT_META = "yollo_active_chats_meta_v1";
     const STORAGE_KEY_BOT_PERSONAS = "yollo_per_bot_personas_v1";
     const STORAGE_KEY_PREFS = "yollo_ui_preferences_v2";
-    const SESSION_UNLOCKED_KEY = "yollo_session_unlocked_bots_v1";
+
+    // ذاكرة مؤقتة للصفحة فقط (تُمسح تلقائياً عند إغلاق الموقع أو الخروج منه والعودة)
+    const unlockedBotsInMemory = new Set();
+    let hiddenTimestamp = 0;
+
+    // إعادة القفل تلقائياً إذا رجع المستخدم للموقع من الخلفية أو من ذاكرة التخزين المؤقت للصفحات
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        unlockedBotsInMemory.clear();
+        if (currentBot && getBotChatMeta(currentBot.id).password) {
+          chatView.classList.remove("active");
+          homeView.classList.add("active");
+          renderBotsGrid();
+        }
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        hiddenTimestamp = Date.now();
+      } else if (hiddenTimestamp && Date.now() - hiddenTimestamp > 3000) {
+        // إذا غادر المستخدم التطبيق/المتصفح لأكثر من 3 ثوانٍ وعاد، يُعاد تفعيل القفل
+        unlockedBotsInMemory.clear();
+        hiddenTimestamp = 0;
+        if (currentBot && getBotChatMeta(currentBot.id).password) {
+          const lockedBot = currentBot;
+          currentBot = null;
+          chatView.classList.remove("active");
+          homeView.classList.add("active");
+          renderBotsGrid();
+          requestOpenBotChat(lockedBot);
+        }
+      }
+    });
 
     function syncDeviceViewport() {
       const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -1910,26 +1943,17 @@
     }
 
     // ==================== إدارة فتح كلمة السر لمرة واحدة في الزيارة ====================
-    function getSessionUnlockedMap() {
-      try {
-        return JSON.parse(sessionStorage.getItem(SESSION_UNLOCKED_KEY) || "{}");
-      } catch {
-        return {};
-      }
-    }
-
     function isBotUnlockedThisSession(botId) {
-      return Boolean(getSessionUnlockedMap()[botId]);
+      return unlockedBotsInMemory.has(String(botId));
     }
 
     function markBotUnlockedThisSession(botId, unlocked = true) {
-      const map = getSessionUnlockedMap();
+      const key = String(botId);
       if (unlocked) {
-        map[botId] = true;
+        unlockedBotsInMemory.add(key);
       } else {
-        delete map[botId];
+        unlockedBotsInMemory.delete(key);
       }
-      sessionStorage.setItem(SESSION_UNLOCKED_KEY, JSON.stringify(map));
     }
 
     // ==================== إدارة بيانات الجلسات النشطة ====================
@@ -1943,20 +1967,22 @@
 
     function getBotChatMeta(botId) {
       const all = getAllChatMeta();
-      return all[botId] || { started: false, pinned: false, password: "" };
+      return all[String(botId)] || { started: false, pinned: false, password: "" };
     }
 
     function updateBotChatMeta(botId, patch) {
       const all = getAllChatMeta();
-      all[botId] = { ...getBotChatMeta(botId), ...patch };
+      const key = String(botId);
+      all[key] = { ...getBotChatMeta(key), ...patch };
       localStorage.setItem(STORAGE_KEY_CHAT_META, JSON.stringify(all));
     }
 
     function removeBotChatMeta(botId) {
       const all = getAllChatMeta();
-      delete all[botId];
+      const key = String(botId);
+      delete all[key];
       localStorage.setItem(STORAGE_KEY_CHAT_META, JSON.stringify(all));
-      markBotUnlockedThisSession(botId, false);
+      markBotUnlockedThisSession(key, false);
     }
 
     function isChatActive(bot) {
@@ -1977,12 +2003,12 @@
 
     function getBotPersona(botId) {
       const all = getAllBotPersonas();
-      return all[botId] || { name: "", title: "", appearance: "", tone: "", bio: "" };
+      return all[String(botId)] || { name: "", title: "", appearance: "", tone: "", bio: "" };
     }
 
     function saveBotPersona(botId, data) {
       const all = getAllBotPersonas();
-      all[botId] = data;
+      all[String(botId)] = data;
       localStorage.setItem(STORAGE_KEY_BOT_PERSONAS, JSON.stringify(all));
     }
 
@@ -2100,11 +2126,11 @@
       } else {
         lockActionState = { mode: "set", bot };
         lockModalTitle.textContent = "🔒 قفل المحادثة بكلمة سر";
-        lockModalDesc.textContent = `اختر كلمة سر لقفل محادثة "${bot.name}" (ستُطلب مرة واحدة عند دخولك للموقع):`;
+        lockModalDesc.textContent = `اختر كلمة سر لقفل محادثة "${bot.name}" (ستُطلب عند خروجك وعودتك للموقع):`;
       }
       lockPasswordInput.value = "";
       lockModal.classList.add("open");
-      lockPasswordInput.focus();
+      setTimeout(() => lockPasswordInput.focus(), 50);
     });
 
     ctxEditBtn.addEventListener("click", () => {
@@ -2148,7 +2174,7 @@
       lockActionState = null;
     });
 
-    confirmLockBtn.addEventListener("click", () => {
+    function submitLockModal() {
       if (!lockActionState) return;
       const pass = lockPasswordInput.value.trim();
       const { mode, bot } = lockActionState;
@@ -2161,12 +2187,12 @@
 
       if (mode === "set") {
         updateBotChatMeta(bot.id, { password: pass });
-        // اعتبرها مفتوحة في الجلسة الحالية لصاحبها، وستُطلب عند إعادة فتح الموقع
+        // تبقى مفتوحة حالياً أثناء جلستك الحالية، وتُقفل تلقائياً عند خروجك وعودتك للموقع
         markBotUnlockedThisSession(bot.id, true);
         lockModal.classList.remove("open");
         lockActionState = null;
         renderBotsGrid();
-        alert(`تم قفل محادثة "${bot.name}" بكلمة سر. ستُطلب تلقائياً عند خروجك وعودتك للموقع.`);
+        alert(`تم قفل محادثة "${bot.name}" بكلمة سر بنجاح. ستُطلب عند عودتك للموقع.`);
       } else if (mode === "remove") {
         if (pass !== meta.password) {
           alert("كلمة السر غير صحيحة!");
@@ -2187,6 +2213,14 @@
         lockModal.classList.remove("open");
         lockActionState = null;
         proceedOpenBotChat(bot);
+      }
+    }
+
+    confirmLockBtn.addEventListener("click", submitLockModal);
+    lockPasswordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitLockModal();
       }
     });
 
@@ -2322,7 +2356,7 @@
     resetAllDataBtn.addEventListener("click", () => {
       if (confirm("هل أنت متأكد من مسح جميع المحادثات والتعديلات؟")) {
         localStorage.clear();
-        sessionStorage.clear();
+        unlockedBotsInMemory.clear();
         settingsModal.classList.remove("open");
         chatView.classList.remove("active");
         homeView.classList.add("active");
@@ -2366,7 +2400,6 @@
       botEditorModal.classList.remove("open");
     });
 
-    // مزامنة رسالة البداية والصورة الترحيبية في سجل المحادثة المحفوظ
     function syncGreetingAndImageInMessages(msgList, bot) {
       const updated = Array.isArray(msgList) ? [...msgList] : [];
       const isLtr = /[a-zA-Z]{10,}/.test(bot.greeting) && !/[\u0600-\u06FF]/.test(bot.greeting);
@@ -2383,7 +2416,6 @@
         });
       }
 
-      // التحقق من وجود صورة ترحيبية في الموضع الثاني (index 1)
       const hasWelcomeImgAtIndex1 = updated.length > 1 && updated[1].role === "bot" && updated[1].type === "image";
 
       if (bot.sendWelcomeImage && bot.avatarUrl) {
@@ -2398,7 +2430,6 @@
           });
         }
       } else {
-        // إذا تم إخفاء الصورة الترحيبية، نحذفها من بداية المحادثة فوراً
         if (hasWelcomeImgAtIndex1) {
           updated.splice(1, 1);
         }
@@ -2442,7 +2473,6 @@
         botEditorModal.classList.remove("open");
 
         if (refreshedBot) {
-          // تحديث السجل المحفوظ للشخصية حتى لو لم تكن مفتوحة حالياً
           const existingMsgs = loadBotMessages(refreshedBot);
           const syncedMsgs = syncGreetingAndImageInMessages(existingMsgs, refreshedBot);
           localStorage.setItem(getStorageKey(refreshedBot), JSON.stringify(syncedMsgs));
@@ -2627,16 +2657,22 @@
       if (meta.password && !isBotUnlockedThisSession(bot.id)) {
         lockActionState = { mode: "unlock_open", bot };
         lockModalTitle.textContent = `🔒 محادثة "${bot.name}" مقفلة`;
-        lockModalDesc.textContent = "أدخل كلمة السر لفتح المحادثة (تُطلب مرة واحدة فقط في هذه الزيارة):";
+        lockModalDesc.textContent = "أدخل كلمة السر لفتح المحادثة:";
         lockPasswordInput.value = "";
         lockModal.classList.add("open");
-        lockPasswordInput.focus();
+        setTimeout(() => lockPasswordInput.focus(), 50);
         return;
       }
       proceedOpenBotChat(bot);
     }
 
     function proceedOpenBotChat(bot) {
+      const meta = getBotChatMeta(bot.id);
+      if (meta.password && !isBotUnlockedThisSession(bot.id)) {
+        requestOpenBotChat(bot);
+        return;
+      }
+
       currentBot = bot;
       updateBotChatMeta(bot.id, { started: true });
 
