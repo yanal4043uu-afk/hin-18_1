@@ -40,7 +40,7 @@
     header {
       background-color: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 12px 16px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -54,19 +54,15 @@
       gap: 12px;
     }
 
-    .avatar {
+    .header-avatar {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: #fff;
+      object-fit: cover;
+      object-position: top center;
       flex-shrink: 0;
-      border: 2px solid rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      background-color: #1f2937;
     }
 
     .bot-info h1 {
@@ -127,25 +123,80 @@
       scroll-behavior: smooth;
     }
 
-    .msg-row {
+    /* بطاقة تعريف الشخصية في أعلى المحادثة */
+    .character-intro {
       display: flex;
       flex-direction: column;
-      max-width: 88%;
+      align-items: center;
+      text-align: center;
+      padding: 14px 12px 18px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(39, 50, 72, 0.5);
+    }
+
+    .intro-avatar {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: top center;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      margin-bottom: 10px;
+      background-color: #1f2937;
+    }
+
+    .intro-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .intro-bio {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-action);
+      max-width: 92%;
+      direction: ltr;
+    }
+
+    /* صفوف الرسائل */
+    .msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      max-width: 92%;
       animation: fadeIn 0.2s ease-out;
     }
 
     .msg-row.user {
       align-self: flex-start;
+      flex-direction: row;
     }
 
-    .msg-row.bot {
+    .msg-row.bot,
+    .msg-row.error {
       align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: top center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background-color: #1f2937;
     }
 
     .bubble {
       padding: 12px 15px;
       border-radius: 16px;
-      line-height: 1.72;
+      line-height: 1.7;
       font-size: 14.5px;
       white-space: pre-wrap;
       word-wrap: break-word;
@@ -164,13 +215,32 @@
       border-bottom-left-radius: 4px;
     }
 
+    .msg-row.bot .bubble.ltr-msg {
+      direction: ltr;
+      text-align: left;
+    }
+
+    .msg-row.bot .bubble.image-bubble {
+      padding: 6px;
+      background-color: var(--bg-bot);
+      border: 1px solid var(--border-color);
+    }
+
+    .chat-sent-img {
+      display: block;
+      width: 210px;
+      max-width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
     .msg-row.error .bubble {
       background-color: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #fca5a5;
     }
 
-    /* تنسيق تقمص الأدوار النظيف */
+    /* تنسيق تقمص الأدوار */
     .rp-action {
       color: var(--text-action);
       font-style: italic;
@@ -299,7 +369,7 @@
 
   <header>
     <div class="bot-profile">
-      <div class="avatar">E</div>
+      <img class="header-avatar" src="https://d.top4top.io/p_39776f6w21.jpg" alt="Cow Girl Emma" />
       <div class="bot-info">
         <h1>Cow Girl Emma</h1>
         <div class="status-line">
@@ -324,13 +394,32 @@
 
   <script>
     const API_BASE_URL = "https://hin-18-1.onrender.com";
-    const STORAGE_KEY_CHAT = "yollo_custom_chat_v2";
+    const BOT_AVATAR_URL = "https://d.top4top.io/p_39776f6w21.jpg";
+    const BOT_NAME = "Cow Girl Emma";
+    const BOT_BIO = 'Emma is a little dense cow girl. She does have a very positive energy. Emma loves to bake, insisting on you trying her food. Food she baked with her “secret ingredient”.';
+
+    const STORAGE_KEY_CHAT = "yollo_emma_chat_v3";
+
+    const DEFAULT_MESSAGES = [
+      {
+        role: "bot",
+        type: "text",
+        ltr: true,
+        content: "*You recently inherited a farm from your grandparents. You have always struggled with money so you think life on a farm could work to make an extra buck. When you make it to the farm for the first time. It’s completely dilapidated with no crops or livestock to be seen. When you enter the house off to the side, you find a woman with cow horns and a tail, wearing a cow print bikini and a bell collar sleeping on the floor. She wakes up when you enter.*\n“Hello, master.”"
+      },
+      {
+        role: "bot",
+        type: "image",
+        imageUrl: BOT_AVATAR_URL,
+        content: ""
+      }
+    ];
 
     const INITIAL_QUICK_REPLIES = [
       { label: "مرحبا", text: "مرحبا" },
-      { label: "*ينظر حوله في المزرعة*", text: "*ينظر حوله في المزرعة*" },
-      { label: "أخبريني عن المزرعة", text: "أخبريني عن المزرعة" },
-      { label: "ما سر الكعك؟", text: "ما سر الكعك الذي تخبزينه؟" }
+      { label: "*ينظر حوله بدهشة*", text: "*ينظر حوله في المنزل المتهالك بدهشة* من أنتِ؟ وكيف دخلتِ إلى هنا؟" },
+      { label: "أخبريني عن المزرعة", text: "مرحباً إيما، أنا صاحب المزرعة الجديد. أخبريني ما الذي حدث لهذا المكان؟" },
+      { label: "ما سر الكعك؟", text: "سمعت أنكِ تحبين الخبز، ما الذي تطبخينه هنا؟" }
     ];
 
     const chatContainer = document.getElementById("chatContainer");
@@ -341,7 +430,18 @@
     const quickBar = document.getElementById("quickBar");
     const clearBtn = document.getElementById("clearBtn");
 
-    let messages = JSON.parse(localStorage.getItem(STORAGE_KEY_CHAT) || "[]");
+    function loadSavedMessages() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_CHAT);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+      return JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+    }
+
+    let messages = loadSavedMessages();
     let isSending = false;
 
     function escapeHtml(text) {
@@ -351,7 +451,6 @@
         .replace(/>/g, "&gt;");
     }
 
-    // تنسيق آمن بدون أي تداخل مع علامات HTML
     function formatRoleplayText(rawText) {
       const tokenRegex = /(\*[^*]+\*|"[^"]+"|“[^”]+”|«[^»]+»)/g;
       const parts = rawText.split(tokenRegex);
@@ -368,50 +467,73 @@
       }).join("");
     }
 
-    // توليد ردود سريعة ذكية بناءً على آخر رد للشخصية
-    function generateSmartQuickReplies(lastBotText) {
-      if (!lastBotText) return INITIAL_QUICK_REPLIES;
+    function generateSmartQuickReplies(lastBotText, allMessages = []) {
+      const userCount = allMessages.filter(m => m.role === "user").length;
+      if (!lastBotText || userCount === 0) return INITIAL_QUICK_REPLIES;
 
-      const t = lastBotText.toLowerCase();
+      const sentTexts = new Set(
+        allMessages.filter(m => m.role === "user").map(m => m.content.trim())
+      );
 
-      if (/كعك|خبز|مطبخ|طعام|أكل|مكون|سر|تذوق|جرب/.test(t)) {
-        return [
-          { label: "*يتذوق قطعة بحذر*", text: "*يتذوق قطعة صغيرة بحذر ويراقب رد فعلها*" },
-          { label: "ما المكون السري؟", text: "أخبريني، ما هو المكون السري في هذا الكعك؟" },
-          { label: "طعمه لذيذ فعلاً!", text: "طعمه لذيذ فعلاً! من أين تعلمتِ الخبز؟" },
-          { label: "*يبتسم*", text: "*يبتسم بهدوء ويجلس قريباً*" }
-        ];
-      }
+      const paragraphs = lastBotText.split(/\n+/).map(p => p.trim()).filter(Boolean);
+      const recentFocus = paragraphs.slice(-2).join(" ").toLowerCase();
+      const fullText = lastBotText.toLowerCase();
 
-      if (/مزرع|أرض|حيوان|محصول|عمل|إصلاح|خراب|بيت/.test(t)) {
-        return [
-          { label: "كيف نصلح المزرعة؟", text: "برأيك من أين نبدأ لإصلاح هذه المزرعة؟" },
-          { label: "هل يوجد حيوانات هنا؟", text: "هل كان هناك أي حيوانات أو محاصيل قبل وصولي؟" },
-          { label: "*يتفقد المكان*", text: "*يتفقد أرجاء المنزل والمزرعة بتأنٍ*" },
-          { label: "سأساعدك", text: "لا تقلقي، سنعيد بناء هذا المكان معاً." }
-        ];
-      }
+      const pickTopic = (txt) => {
+        if (/أرض|نزرع|زراع|مزرع|شتا|نتفقد|محصول|حقل|إصلاح/.test(txt)) {
+          return [
+            { label: "يلا نتفقد الأرض معاً", text: "*يوافق برأسه* يلا نطلع نتفقد الأرض من ورا ونشوف شو نقدر نزرع قبل الشتا." },
+            { label: "شو نقدر نزرع هلا؟", text: "شو المحاصيل اللي تتحمل البرد ونقدر نزرعها قبل ما يجي الشتا؟" },
+            { label: "في أدوات زراعة هون؟", text: "عندك فكرة إذا في أدوات زراعة أو بذور مخزنة بالمزرعة؟" },
+            { label: "*يمشي باتجاه الباب الخلفي*", text: "*يتجه نحو الباب الخلفي للمنزل ليخرج إلى الأرض*" }
+          ];
+        }
 
-      if (/\?|؟|هل|ماذا|كيف|لماذا|أين/.test(t)) {
-        return [
-          { label: "نعم، بالتأكيد", text: "نعم، بالتأكيد." },
-          { label: "لا، ليس بعد", text: "لا، ليس بعد، لكنني مستعد." },
-          { label: "أخبريني أكثر", text: "أخبريني أكثر عن ذلك." },
-          { label: "*يفكر قليلاً*", text: "*يفكر للحظة ثم يرد عليها*" }
-        ];
-      }
+        if (/حليب|بقر|كعك|كيك|خبز|مطبخ|طعام|وصف|مكون|سر/.test(txt)) {
+          return [
+            { label: "ما رح أخبر حدا، وعد", text: "لا تقلقي، سرك بأمان معي وما رح أخبر حدا." },
+            { label: "يلا نروح نتفقد الأرض", text: "تمام، خلينا هلا نطلع نتفقد الأرض قبل ما يجي الشتا." },
+            { label: "*يضحك بخفة*", text: "*يضحك بخفة على تلعثمها* المهم إنه طعمه طيب فعلاً." },
+            { label: "شو الخطوة الجاية؟", text: "طيب، شو خطتنا الجاية بالمزرعة؟" }
+          ];
+        }
 
-      return [
+        if (/\?|؟|إيش رأيك|شو رأيك|هل|ماذا|كيف/.test(txt)) {
+          return [
+            { label: "فكرة ممتازة، يلا", text: "فكرة ممتازة، يلا نبدأ فوراً." },
+            { label: "خلينا نخطط أول", text: "خلينا نخطط بهدوء قبل ما نبدأ." },
+            { label: "*ينظر إليها باهتمام*", text: "*ينظر إليها باهتمام* شو برأيك الأهم حالياً؟" },
+            { label: "كملي كلامك", text: "كملي، أنا عم بسمعك." }
+          ];
+        }
+
+        return null;
+      };
+
+      let candidates = pickTopic(recentFocus) || pickTopic(fullText) || [
         { label: "استمري", text: "استمري." },
-        { label: "*يقترب منها*", text: "*يقترب منها بهدوء*" },
-        { label: "وماذا بعد؟", text: "وماذا بعد ذلك؟" },
-        { label: "*يستمع بانتباه*", text: "*يستمع إليها بانتباه*" }
+        { label: "*يتفقد المكان حوله*", text: "*يتفقد المكان حوله بفضول*" },
+        { label: "شو لازم نعمل هلا؟", text: "شو برأيك لازم نعمل هلا؟" },
+        { label: "*يبتسم بهدوء*", text: "*يبتسم بهدوء*" }
+      ];
+
+      const filtered = candidates.filter(item => !sentTexts.has(item.text.trim()));
+      return filtered.length > 0 ? filtered : [
+        { label: "كملي القصة", text: "كملي، شو صار بعدين؟" },
+        { label: "*يأخذ نفساً عميقاً*", text: "*يأخذ نفساً عميقاً وينظر للأفق*" },
+        { label: "خلينا نتحرك", text: "يلا نتحرك ونشوف الوضع." }
       ];
     }
 
     function renderQuickBar() {
-      const lastBotMsg = [...messages].reverse().find(m => m.role === "bot");
-      const suggestions = generateSmartQuickReplies(lastBotMsg ? lastBotMsg.content : "");
+      const lastBotTextMsg = [...messages]
+        .reverse()
+        .find(m => m.role === "bot" && m.type !== "image" && m.content);
+
+      const suggestions = generateSmartQuickReplies(
+        lastBotTextMsg ? lastBotTextMsg.content : "",
+        messages
+      );
 
       quickBar.innerHTML = "";
       suggestions.forEach(item => {
@@ -439,14 +561,41 @@
       localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(messages));
     }
 
+    function renderCharacterIntro() {
+      const intro = document.createElement("div");
+      intro.className = "character-intro";
+      intro.innerHTML = `
+        <img class="intro-avatar" src="${BOT_AVATAR_URL}" alt="${BOT_NAME}" />
+        <div class="intro-name">${BOT_NAME}</div>
+        <div class="intro-bio">${escapeHtml(BOT_BIO)}</div>
+      `;
+      chatContainer.appendChild(intro);
+    }
+
     function renderMessage(msg, shouldScroll = true) {
       const row = document.createElement("div");
       row.className = `msg-row ${msg.role}`;
 
+      if (msg.role === "bot" || msg.role === "error") {
+        const avatar = document.createElement("img");
+        avatar.className = "msg-avatar";
+        avatar.src = BOT_AVATAR_URL;
+        avatar.alt = BOT_NAME;
+        row.appendChild(avatar);
+      }
+
       const bubble = document.createElement("div");
       bubble.className = "bubble";
 
-      if (msg.role === "bot") {
+      if (msg.type === "image" && msg.imageUrl) {
+        bubble.classList.add("image-bubble");
+        const img = document.createElement("img");
+        img.className = "chat-sent-img";
+        img.src = msg.imageUrl;
+        img.alt = BOT_NAME;
+        bubble.appendChild(img);
+      } else if (msg.role === "bot") {
+        if (msg.ltr) bubble.classList.add("ltr-msg");
         bubble.innerHTML = formatRoleplayText(msg.content);
       } else {
         bubble.textContent = msg.content;
@@ -462,6 +611,7 @@
 
     function renderAllMessages() {
       chatContainer.innerHTML = "";
+      renderCharacterIntro();
       messages.forEach(m => renderMessage(m, false));
       chatContainer.scrollTop = chatContainer.scrollHeight;
       renderQuickBar();
@@ -472,6 +622,7 @@
       row.className = "msg-row bot";
       row.id = "typingIndicator";
       row.innerHTML = `
+        <img class="msg-avatar" src="${BOT_AVATAR_URL}" alt="${BOT_NAME}" />
         <div class="bubble">
           <div class="typing-dots"><span></span><span></span><span></span></div>
         </div>
@@ -489,7 +640,7 @@
       const text = (customText ?? msgInput.value).trim();
       if (!text || isSending) return;
 
-      const userMsg = { role: "user", content: text };
+      const userMsg = { role: "user", type: "text", content: text };
       messages.push(userMsg);
       saveMessages();
       renderMessage(userMsg);
@@ -512,9 +663,9 @@
 
         if (!response.ok || !data.ok) {
           const errText = data.reply || data.error || "حدث خطأ أثناء الاتصال بالنموذج";
-          renderMessage({ role: "error", content: errText });
+          renderMessage({ role: "error", type: "text", content: errText });
         } else {
-          const botMsg = { role: "bot", content: data.reply };
+          const botMsg = { role: "bot", type: "text", content: data.reply };
           messages.push(botMsg);
           saveMessages();
           renderMessage(botMsg);
@@ -524,6 +675,7 @@
         removeTypingBubble();
         renderMessage({
           role: "error",
+          type: "text",
           content: "تعذر الوصول إلى السيرفر. تأكد من أن خادم Render نشط."
         });
       } finally {
@@ -546,8 +698,8 @@
     sendBtn.addEventListener("click", () => sendMessage());
 
     clearBtn.addEventListener("click", () => {
-      if (confirm("هل تريد مسح سجل المحادثة من الشاشة؟")) {
-        messages = [];
+      if (confirm("هل تريد إعادة المحادثة إلى البداية؟")) {
+        messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
         saveMessages();
         renderAllMessages();
       }
