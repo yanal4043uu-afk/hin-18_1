@@ -6,14 +6,15 @@
   <title>Yollo RP — استكشاف الشخصيات</title>
   <style>
     :root {
-      --bg-main: #090c12;
-      --bg-header: #101520;
-      --bg-card: #141a26;
-      --bg-card-hover: #1b2333;
-      --bg-bot: #1a2234;
-      --bg-user: #2563eb;
-      --bg-input: #161e2e;
-      --border-color: #242e42;
+      --bg-main: #080b11;
+      --bg-header: rgba(15, 20, 31, 0.88);
+      --bg-card: #121824;
+      --bg-card-hover: #182030;
+      --bg-bot: rgba(24, 32, 48, 0.92);
+      --bg-user: linear-gradient(135deg, #2563eb, #3b82f6);
+      --bg-input: #141b29;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
       --text-primary: #f3f4f6;
       --text-action: #9ca3af;
       --text-quote: #ffffff;
@@ -43,21 +44,24 @@
       flex-direction: column;
       height: 100dvh;
       width: 100%;
+      position: relative;
     }
 
     .view.active {
       display: flex;
     }
 
-    /* ==================== الواجهة الرئيسية (Lobby) ==================== */
+    /* ==================== 1. الواجهة الرئيسية (Lobby) ==================== */
     .home-header {
       background-color: var(--bg-header);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
       padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      z-index: 10;
     }
 
     .brand {
@@ -68,19 +72,20 @@
       font-size: 18px;
       color: #fff;
       letter-spacing: 0.3px;
+      flex-shrink: 0;
     }
 
     .brand-badge {
       background: linear-gradient(135deg, #6366f1, #ec4899);
       padding: 3px 8px;
       border-radius: 8px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
     }
 
     .search-box {
       flex: 1;
-      max-width: 220px;
+      max-width: 230px;
     }
 
     .search-box input {
@@ -88,22 +93,100 @@
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       border-radius: 999px;
-      padding: 7px 14px;
+      padding: 8px 14px;
       color: #fff;
       font-size: 13px;
       outline: none;
+      transition: border-color 0.2s;
     }
 
     .search-box input:focus {
       border-color: var(--accent);
     }
 
+    /* شريط متابعة آخر محادثة */
+    .continue-banner-wrap {
+      padding: 12px 14px 2px;
+      display: none;
+    }
+
+    .continue-banner-wrap.visible {
+      display: block;
+    }
+
+    .continue-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(30, 41, 59, 0.7));
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .continue-card:active {
+      transform: scale(0.985);
+    }
+
+    .continue-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .continue-info img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: top center;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .continue-text {
+      min-width: 0;
+    }
+
+    .continue-label {
+      font-size: 10.5px;
+      color: #a5b4fc;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .continue-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .continue-preview {
+      font-size: 11.5px;
+      color: var(--text-action);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .continue-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
     /* شريط الفلاتر والتصنيفات */
     .filter-section {
       padding: 12px 14px 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
       background-color: var(--bg-main);
     }
 
@@ -122,26 +205,27 @@
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       color: var(--text-action);
-      padding: 6px 14px;
+      padding: 6px 15px;
       border-radius: 999px;
       font-size: 12.5px;
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
-      transition: 0.15s;
+      transition: 0.18s;
     }
 
     .filter-pill.active {
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: #fff;
       border-color: transparent;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
     /* شبكة بطاقات الشخصيات */
     .bots-grid-wrapper {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 14px 24px;
+      padding: 10px 14px 28px;
     }
 
     .bots-grid {
@@ -151,15 +235,11 @@
     }
 
     @media (min-width: 640px) {
-      .bots-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .bots-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (min-width: 960px) {
-      .bots-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
+      .bots-grid { grid-template-columns: repeat(4, 1fr); }
     }
 
     .bot-card {
@@ -170,7 +250,13 @@
       display: flex;
       flex-direction: column;
       cursor: pointer;
-      transition: transform 0.18s ease, border-color 0.18s ease;
+      position: relative;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .bot-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .bot-card:active {
@@ -178,10 +264,28 @@
       border-color: var(--accent);
     }
 
+    .delete-custom-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 4;
+      background: rgba(15, 20, 31, 0.78);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .card-media {
       position: relative;
       width: 100%;
-      aspect-ratio: 3 / 3.6;
+      aspect-ratio: 3 / 3.65;
       background-color: #1c2436;
       overflow: hidden;
     }
@@ -198,7 +302,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(20, 26, 38, 0.95) 0%, transparent 42%);
+      background: linear-gradient(to top, rgba(18, 24, 36, 0.98) 0%, transparent 45%);
       pointer-events: none;
     }
 
@@ -207,8 +311,8 @@
       bottom: 8px;
       left: 8px;
       z-index: 2;
-      background: rgba(11, 15, 23, 0.72);
-      backdrop-filter: blur(4px);
+      background: rgba(8, 11, 17, 0.75);
+      backdrop-filter: blur(6px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       color: #e5e7eb;
       font-size: 11px;
@@ -267,33 +371,69 @@
       border-radius: 999px;
     }
 
-    .coming-soon-card {
-      background: rgba(20, 26, 38, 0.45);
-      border: 1px dashed var(--border-color);
+    /* بطاقة إضافة شخصية جديدة */
+    .add-bot-card {
+      background: rgba(18, 24, 36, 0.5);
+      border: 1.5px dashed rgba(99, 102, 241, 0.35);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px 12px;
+      padding: 20px 14px;
       color: var(--text-action);
-      min-height: 240px;
-      gap: 8px;
+      min-height: 250px;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.2s;
     }
 
-    .coming-soon-card span {
-      font-size: 26px;
+    .add-bot-card:hover {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: var(--accent);
+      color: #fff;
     }
 
-    .coming-soon-card p {
-      font-size: 12.5px;
-      line-height: 1.5;
+    .add-icon-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
     }
 
-    /* ==================== واجهة المحادثة (Chat View) ==================== */
+    .add-bot-card p {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .add-bot-card small {
+      font-size: 11px;
+      color: var(--text-action);
+    }
+
+    /* ==================== 2. واجهة المحادثة (Chat View) ==================== */
+    .ambient-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: top center;
+      filter: blur(42px) saturate(1.2);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+      transform: scale(1.1);
+    }
+
     header.chat-header {
       background-color: var(--bg-header);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border-color);
       padding: 10px 14px;
       display: flex;
@@ -307,6 +447,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
     }
 
     .back-btn {
@@ -328,6 +469,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
     }
 
     .header-avatar {
@@ -337,7 +479,7 @@
       object-fit: cover;
       object-position: top center;
       flex-shrink: 0;
-      border: 2px solid rgba(255, 255, 255, 0.18);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       background-color: #1f2937;
     }
 
@@ -345,6 +487,9 @@
       font-size: 14.5px;
       font-weight: 700;
       color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .status-line {
@@ -368,12 +513,19 @@
       animation: pulse 1s infinite;
     }
 
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
     .icon-btn {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      padding: 7px 12px;
-      border-radius: 8px;
+      padding: 7px 11px;
+      border-radius: 9px;
       font-size: 12px;
       cursor: pointer;
     }
@@ -386,11 +538,13 @@
     #chatContainer {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 16px 14px;
       display: flex;
       flex-direction: column;
       gap: 14px;
       scroll-behavior: smooth;
+      position: relative;
+      z-index: 1;
     }
 
     .character-intro {
@@ -400,7 +554,7 @@
       text-align: center;
       padding: 14px 12px 18px;
       margin-bottom: 4px;
-      border-bottom: 1px solid rgba(39, 50, 72, 0.5);
+      border-bottom: 1px solid var(--border-color);
     }
 
     .intro-avatar {
@@ -409,8 +563,8 @@
       border-radius: 50%;
       object-fit: cover;
       object-position: top center;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       margin-bottom: 10px;
       background-color: #1f2937;
     }
@@ -457,23 +611,32 @@
       object-position: top center;
       flex-shrink: 0;
       margin-top: 2px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       background-color: #1f2937;
+    }
+
+    .msg-content-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
     }
 
     .bubble {
       padding: 12px 15px;
       border-radius: 16px;
-      line-height: 1.7;
+      line-height: 1.72;
       font-size: 14.5px;
       white-space: pre-wrap;
       word-wrap: break-word;
+      backdrop-filter: blur(8px);
     }
 
     .msg-row.user .bubble {
-      background-color: var(--bg-user);
+      background: var(--bg-user);
       color: #fff;
       border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
     }
 
     .msg-row.bot .bubble {
@@ -508,6 +671,38 @@
       color: #fca5a5;
     }
 
+    /* أزرار نسخ وحذف الرسالة */
+    .msg-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+      opacity: 0.78;
+    }
+
+    .msg-row.user .msg-tools {
+      justify-content: flex-start;
+    }
+
+    .msg-row.bot .msg-tools {
+      justify-content: flex-end;
+    }
+
+    .mini-tool-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-action);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .mini-tool-btn:hover {
+      color: #fff;
+      border-color: var(--border-strong);
+    }
+
     .rp-action {
       color: var(--text-action);
       font-style: italic;
@@ -540,9 +735,12 @@
       gap: 8px;
       padding: 8px 14px;
       overflow-x: auto;
-      background-color: var(--bg-main);
-      border-top: 1px solid rgba(39, 50, 72, 0.5);
+      background-color: rgba(8, 11, 17, 0.85);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border-color);
       scrollbar-width: none;
+      position: relative;
+      z-index: 2;
     }
 
     .quick-bar::-webkit-scrollbar {
@@ -567,11 +765,14 @@
 
     .input-area {
       background-color: var(--bg-header);
+      backdrop-filter: blur(12px);
       border-top: 1px solid var(--border-color);
       padding: 10px 12px;
       display: flex;
       gap: 8px;
       align-items: flex-end;
+      position: relative;
+      z-index: 2;
     }
 
     textarea {
@@ -594,7 +795,7 @@
     }
 
     #sendBtn {
-      background-color: var(--accent-blue);
+      background: var(--bg-user);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -609,6 +810,72 @@
     #sendBtn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    /* نافذة إضافة شخصية جديدة */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #121824;
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 18px;
+      width: 100%;
+      max-width: 410px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal h2 {
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .modal label {
+      font-size: 12px;
+      color: var(--text-action);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .modal input,
+    .modal textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 9px 11px;
+      border-radius: 9px;
+      font-size: 13px;
+      min-height: 38px;
+    }
+
+    .modal-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
     }
 
     @keyframes bounce {
@@ -641,12 +908,16 @@
       </div>
     </header>
 
+    <!-- شريط متابعة المحادثة الجارية -->
+    <div class="continue-banner-wrap" id="continueBannerWrap"></div>
+
     <div class="filter-section">
       <div class="pill-tabs" id="categoryTabs">
         <button class="filter-pill active" data-filter="all">الكل ✨</button>
         <button class="filter-pill" data-filter="female">أنثى ♀</button>
         <button class="filter-pill" data-filter="anime">أنيمي</button>
         <button class="filter-pill" data-filter="story">قصة</button>
+        <button class="filter-pill" data-filter="custom">مخصصة ⭐</button>
       </div>
     </div>
 
@@ -657,6 +928,8 @@
 
   <!-- ==================== 2. واجهة المحادثة ==================== -->
   <section id="chatView" class="view">
+    <div class="ambient-bg" id="ambientBg"></div>
+
     <header class="chat-header">
       <div class="chat-header-right">
         <button class="back-btn" id="backBtn" title="العودة للرئيسية">→</button>
@@ -671,7 +944,8 @@
           </div>
         </div>
       </div>
-      <div>
+      <div class="header-controls">
+        <button class="icon-btn" id="sfxToggleBtn" title="صوت النقرات">🔔</button>
         <button class="icon-btn danger" id="clearBtn">مسح</button>
       </div>
     </header>
@@ -686,17 +960,57 @@
     </div>
   </section>
 
+  <!-- نافذة إضافة شخصية جديدة -->
+  <div class="modal-backdrop" id="addBotModal">
+    <div class="modal">
+      <h2>إضافة شخصية جديدة</h2>
+      <div>
+        <label>اسم الشخصية</label>
+        <input type="text" id="newBotName" placeholder="مثال: Oujodere Classmate" />
+      </div>
+      <div class="modal-row">
+        <div>
+          <label>Bot ID</label>
+          <input type="number" id="newBotId" placeholder="148005" dir="ltr" />
+        </div>
+        <div>
+          <label>Session ID</label>
+          <input type="number" id="newSessionId" placeholder="21702378" dir="ltr" />
+        </div>
+      </div>
+      <div>
+        <label>رابط صورة الشخصية</label>
+        <input type="url" id="newBotAvatar" placeholder="https://..." dir="ltr" />
+      </div>
+      <div>
+        <label>وصف مختصر (Bio)</label>
+        <input type="text" id="newBotBio" placeholder="وصف الشخصية الذي يظهر تحت الاسم..." />
+      </div>
+      <div>
+        <label>الرسالة الافتتاحية (Greeting)</label>
+        <textarea id="newBotGreeting" rows="2" placeholder="*تبتسم وتنظر إليك* مرحباً..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="icon-btn" id="cancelAddBotBtn">إلغاء</button>
+        <button class="icon-btn" style="background: var(--accent); border-color: var(--accent);" id="saveNewBotBtn">إضافة</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE_URL = "https://hin-18-1.onrender.com";
+    const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v1";
+    const STORAGE_KEY_LAST_BOT = "yollo_last_active_bot_id";
+    const STORAGE_KEY_SFX = "yollo_ui_sfx_enabled";
 
-    // قائمة البوتات المتاحة في الواجهة الرئيسية (يمكن إضافة أي بوت جديد هنا مستقبلاً)
-    const BOTS_CATALOG = [
+    const DEFAULT_BOTS = [
       {
         botId: 148005,
         sessionId: 21702378,
         name: "Cow Girl Emma",
         avatarUrl: "https://d.top4top.io/p_39776f6w21.jpg",
         chatsCount: "4.0m",
+        isCustom: false,
         categories: ["all", "female", "anime", "story"],
         tags: ["cowgirl", "رعب", "قصة"],
         bio: 'Emma is a little dense cow girl. She does have a very positive energy. Emma loves to bake, insisting on you trying her food. Food she baked with her “secret ingredient”.',
@@ -711,14 +1025,15 @@
       }
     ];
 
-    // عناصر الواجهة الرئيسية
+    // عناصر الواجهة
     const homeView = document.getElementById("homeView");
     const chatView = document.getElementById("chatView");
+    const ambientBg = document.getElementById("ambientBg");
+    const continueBannerWrap = document.getElementById("continueBannerWrap");
     const botsGrid = document.getElementById("botsGrid");
     const searchInput = document.getElementById("searchInput");
     const categoryTabs = document.getElementById("categoryTabs");
 
-    // عناصر واجهة المحادثة
     const backBtn = document.getElementById("backBtn");
     const chatHeaderAvatar = document.getElementById("chatHeaderAvatar");
     const chatHeaderName = document.getElementById("chatHeaderName");
@@ -729,31 +1044,118 @@
     const statusText = document.getElementById("statusText");
     const quickBar = document.getElementById("quickBar");
     const clearBtn = document.getElementById("clearBtn");
+    const sfxToggleBtn = document.getElementById("sfxToggleBtn");
+
+    // عناصر نافذة الإضافة
+    const addBotModal = document.getElementById("addBotModal");
+    const cancelAddBotBtn = document.getElementById("cancelAddBotBtn");
+    const saveNewBotBtn = document.getElementById("saveNewBotBtn");
 
     let activeCategory = "all";
     let currentBot = null;
     let messages = [];
     let isSending = false;
+    let sfxEnabled = localStorage.getItem(STORAGE_KEY_SFX) !== "false";
+
+    function updateSfxButton() {
+      sfxToggleBtn.textContent = sfxEnabled ? "🔔" : "🔕";
+    }
+    updateSfxButton();
+
+    sfxToggleBtn.addEventListener("click", () => {
+      sfxEnabled = !sfxEnabled;
+      localStorage.setItem(STORAGE_KEY_SFX, String(sfxEnabled));
+      updateSfxButton();
+    });
+
+    // صوت نقرة خفيف عبر Web Audio API دون ملفات خارجية
+    function playUiPop(freq = 520) {
+      if (!sfxEnabled) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.03, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch {}
+    }
+
+    function getAllBots() {
+      let custom = [];
+      try {
+        custom = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_BOTS) || "[]");
+      } catch {}
+      return [...DEFAULT_BOTS, ...custom];
+    }
 
     function escapeHtml(text) {
-      return text
+      return String(text || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
 
-    // ==================== منطق الواجهة الرئيسية ====================
+    // ==================== شريط متابعة المحادثة ====================
+    function renderContinueBanner() {
+      const lastBotId = Number(localStorage.getItem(STORAGE_KEY_LAST_BOT));
+      if (!lastBotId) {
+        continueBannerWrap.classList.remove("visible");
+        return;
+      }
+      const bot = getAllBots().find(b => b.botId === lastBotId);
+      if (!bot) {
+        continueBannerWrap.classList.remove("visible");
+        return;
+      }
+      const savedMsgs = loadBotMessages(bot);
+      const hasUserHistory = savedMsgs.some(m => m.role === "user");
+      if (!hasUserHistory) {
+        continueBannerWrap.classList.remove("visible");
+        return;
+      }
+      const lastTextMsg = [...savedMsgs].reverse().find(m => m.content);
+      const preview = lastTextMsg ? lastTextMsg.content.replace(/\*/g, "") : "متابعة المحادثة...";
+
+      continueBannerWrap.innerHTML = `
+        <div class="continue-card" id="resumeChatCard">
+          <div class="continue-info">
+            <img src="${bot.avatarUrl}" alt="${escapeHtml(bot.name)}" />
+            <div class="continue-text">
+              <div class="continue-label">متابعة المحادثة السابقة</div>
+              <div class="continue-title">${escapeHtml(bot.name)}</div>
+              <div class="continue-preview">${escapeHtml(preview)}</div>
+            </div>
+          </div>
+          <button class="continue-btn">متابعة</button>
+        </div>
+      `;
+      continueBannerWrap.classList.add("visible");
+      document.getElementById("resumeChatCard").onclick = () => openBotChat(bot);
+    }
+
+    // ==================== الشبكة الرئيسية ====================
     function renderBotsGrid() {
+      renderContinueBanner();
       const query = searchInput.value.trim().toLowerCase();
       botsGrid.innerHTML = "";
 
-      const filteredBots = BOTS_CATALOG.filter(bot => {
-        const matchesCat = activeCategory === "all" || bot.categories.includes(activeCategory);
+      const allBots = getAllBots();
+      const filteredBots = allBots.filter(bot => {
+        const matchesCat =
+          activeCategory === "all" ||
+          (activeCategory === "custom" && bot.isCustom) ||
+          (bot.categories && bot.categories.includes(activeCategory));
         const matchesQuery =
           !query ||
           bot.name.toLowerCase().includes(query) ||
           bot.bio.toLowerCase().includes(query) ||
-          bot.tags.some(t => t.toLowerCase().includes(query));
+          (bot.tags && bot.tags.some(t => t.toLowerCase().includes(query)));
         return matchesCat && matchesQuery;
       });
 
@@ -761,31 +1163,94 @@
         const card = document.createElement("div");
         card.className = "bot-card";
         card.innerHTML = `
+          ${bot.isCustom ? `<button class="delete-custom-btn" title="حذف الشخصية">✕</button>` : ""}
           <div class="card-media">
             <img src="${bot.avatarUrl}" alt="${escapeHtml(bot.name)}" loading="lazy" />
-            <div class="chat-count-badge">💬 ${escapeHtml(bot.chatsCount)}</div>
+            <div class="chat-count-badge">💬 ${escapeHtml(bot.chatsCount || "جديد")}</div>
           </div>
           <div class="card-body">
             <div class="card-title">${escapeHtml(bot.name)}</div>
             <div class="card-desc">${escapeHtml(bot.bio)}</div>
             <div class="card-tags">
-              ${bot.tags.map(tag => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join("")}
+              ${(bot.tags || []).map(tag => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join("")}
             </div>
           </div>
         `;
+
+        if (bot.isCustom) {
+          card.querySelector(".delete-custom-btn").onclick = (e) => {
+            e.stopPropagation();
+            if (confirm(`حذف شخصية "${bot.name}"؟`)) {
+              const updated = getAllBots().filter(b => b.isCustom && b.botId !== bot.botId);
+              localStorage.setItem(STORAGE_KEY_CUSTOM_BOTS, JSON.stringify(updated));
+              localStorage.removeItem(getStorageKey(bot));
+              renderBotsGrid();
+            }
+          };
+        }
+
         card.onclick = () => openBotChat(bot);
         botsGrid.appendChild(card);
       });
 
-      // بطاقة توضيحية لإضافة شخصيات جديدة مستقبلاً
+      // بطاقة تفاعلية لإضافة بوت جديد
       const addCard = document.createElement("div");
-      addCard.className = "coming-soon-card";
+      addCard.className = "add-bot-card";
       addCard.innerHTML = `
-        <span>➕</span>
-        <p>المزيد من الشخصيات قريباً...</p>
+        <div class="add-icon-circle">+</div>
+        <p>إضافة شخصية جديدة</p>
+        <small>اربط أي Bot ID و Session ID</small>
       `;
+      addCard.onclick = () => {
+        addBotModal.classList.add("open");
+      };
       botsGrid.appendChild(addCard);
     }
+
+    cancelAddBotBtn.addEventListener("click", () => {
+      addBotModal.classList.remove("open");
+    });
+
+    saveNewBotBtn.addEventListener("click", () => {
+      const name = document.getElementById("newBotName").value.trim();
+      const botId = Number(document.getElementById("newBotId").value.trim());
+      const sessionId = Number(document.getElementById("newSessionId").value.trim());
+      const avatarUrl = document.getElementById("newBotAvatar").value.trim() || "https://d.top4top.io/p_39776f6w21.jpg";
+      const bio = document.getElementById("newBotBio").value.trim() || "شخصية مخصصة للمحادثة التفاعلية.";
+      const greeting = document.getElementById("newBotGreeting").value.trim() || "*تبتسم وتنظر إليك*\n“أهلاً بك!”";
+
+      if (!name || !botId || !sessionId) {
+        alert("يرجى إدخال اسم الشخصية و Bot ID و Session ID.");
+        return;
+      }
+
+      const customList = getAllBots().filter(b => b.isCustom);
+      customList.push({
+        botId,
+        sessionId,
+        name,
+        avatarUrl,
+        chatsCount: "مخصص",
+        isCustom: true,
+        categories: ["all", "custom"],
+        tags: ["مخصص", "قصة"],
+        bio,
+        greeting,
+        sendWelcomeImage: false,
+        initialQuickReplies: [
+          { label: "مرحبا", text: "مرحبا" },
+          { label: "*ينظر باهتمام*", text: "*ينظر إليها باهتمام* من أنتِ؟" },
+          { label: "أخبريني عن نفسك", text: "أخبريني أكثر عن نفسك وعن هذا المكان." }
+        ]
+      });
+
+      localStorage.setItem(STORAGE_KEY_CUSTOM_BOTS, JSON.stringify(customList));
+      addBotModal.classList.remove("open");
+      ["newBotName", "newBotId", "newSessionId", "newBotAvatar", "newBotBio", "newBotGreeting"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      renderBotsGrid();
+    });
 
     categoryTabs.querySelectorAll(".filter-pill").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -798,7 +1263,7 @@
 
     searchInput.addEventListener("input", renderBotsGrid);
 
-    // ==================== التنقل بين الواجهتين ====================
+    // ==================== التنقل وإدارة الجلسة ====================
     function getStorageKey(bot) {
       return `yollo_chat_bot_${bot.botId}_v1`;
     }
@@ -808,7 +1273,7 @@
         {
           role: "bot",
           type: "text",
-          ltr: true,
+          ltr: /[a-zA-Z]{10,}/.test(bot.greeting) && !/[\u0600-\u06FF]/.test(bot.greeting),
           content: bot.greeting
         }
       ];
@@ -841,9 +1306,12 @@
 
     function openBotChat(bot) {
       currentBot = bot;
+      localStorage.setItem(STORAGE_KEY_LAST_BOT, String(bot.botId));
+
       chatHeaderAvatar.src = bot.avatarUrl;
       chatHeaderAvatar.alt = bot.name;
       chatHeaderName.textContent = bot.name;
+      ambientBg.style.backgroundImage = `url('${bot.avatarUrl}')`;
 
       messages = loadBotMessages(bot);
       renderAllMessages();
@@ -855,9 +1323,10 @@
     backBtn.addEventListener("click", () => {
       chatView.classList.remove("active");
       homeView.classList.add("active");
+      renderBotsGrid();
     });
 
-    // ==================== منطق المحادثة ====================
+    // ==================== تنسيق وعرض الرسائل ====================
     function formatRoleplayText(rawText) {
       const tokenRegex = /(\*[^*]+\*|"[^"]+"|“[^”]+”|«[^»]+»)/g;
       const parts = rawText.split(tokenRegex);
@@ -978,7 +1447,7 @@
       chatContainer.appendChild(intro);
     }
 
-    function renderMessage(msg, shouldScroll = true) {
+    function renderMessage(msg, index, shouldScroll = true) {
       const row = document.createElement("div");
       row.className = `msg-row ${msg.role}`;
 
@@ -989,6 +1458,9 @@
         avatar.alt = currentBot.name;
         row.appendChild(avatar);
       }
+
+      const contentWrap = document.createElement("div");
+      contentWrap.className = "msg-content-wrap";
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
@@ -1007,7 +1479,39 @@
         bubble.textContent = msg.content;
       }
 
-      row.appendChild(bubble);
+      contentWrap.appendChild(bubble);
+
+      // أزرار نسخ وحذف للرسائل النصية (بعد الرسائل الترحيبية)
+      if (msg.type !== "image" && msg.content && index >= 1 && msg.role !== "error") {
+        const tools = document.createElement("div");
+        tools.className = "msg-tools";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "mini-tool-btn";
+        copyBtn.textContent = "نسخ";
+        copyBtn.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(msg.content);
+            copyBtn.textContent = "تم ✓";
+            setTimeout(() => { copyBtn.textContent = "نسخ"; }, 1200);
+          } catch {}
+        };
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "mini-tool-btn";
+        delBtn.textContent = "حذف";
+        delBtn.onclick = () => {
+          messages.splice(index, 1);
+          saveMessages();
+          renderAllMessages();
+        };
+
+        tools.appendChild(copyBtn);
+        tools.appendChild(delBtn);
+        contentWrap.appendChild(tools);
+      }
+
+      row.appendChild(contentWrap);
       chatContainer.appendChild(row);
 
       if (shouldScroll) {
@@ -1018,7 +1522,7 @@
     function renderAllMessages() {
       chatContainer.innerHTML = "";
       renderCharacterIntro();
-      messages.forEach(m => renderMessage(m, false));
+      messages.forEach((m, idx) => renderMessage(m, idx, false));
       chatContainer.scrollTop = chatContainer.scrollHeight;
       renderQuickBar();
     }
@@ -1029,8 +1533,10 @@
       row.id = "typingIndicator";
       row.innerHTML = `
         <img class="msg-avatar" src="${currentBot ? currentBot.avatarUrl : ""}" alt="" />
-        <div class="bubble">
-          <div class="typing-dots"><span></span><span></span><span></span></div>
+        <div class="msg-content-wrap">
+          <div class="bubble">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
         </div>
       `;
       chatContainer.appendChild(row);
@@ -1046,10 +1552,11 @@
       const text = (customText ?? msgInput.value).trim();
       if (!text || isSending || !currentBot) return;
 
+      playUiPop(580);
       const userMsg = { role: "user", type: "text", content: text };
       messages.push(userMsg);
       saveMessages();
-      renderMessage(userMsg);
+      renderMessage(userMsg, messages.length - 1);
 
       msgInput.value = "";
       msgInput.style.height = "44px";
@@ -1073,12 +1580,13 @@
 
         if (!response.ok || !data.ok) {
           const errText = data.reply || data.error || "حدث خطأ أثناء الاتصال بالنموذج";
-          renderMessage({ role: "error", type: "text", content: errText });
+          renderMessage({ role: "error", type: "text", content: errText }, -1);
         } else {
+          playUiPop(440);
           const botMsg = { role: "bot", type: "text", content: data.reply };
           messages.push(botMsg);
           saveMessages();
-          renderMessage(botMsg);
+          renderMessage(botMsg, messages.length - 1);
           renderQuickBar();
         }
       } catch (err) {
@@ -1087,7 +1595,7 @@
           role: "error",
           type: "text",
           content: "تعذر الوصول إلى السيرفر. تأكد من أن خادم Render نشط."
-        });
+        }, -1);
       } finally {
         setTypingState(false);
       }
@@ -1116,7 +1624,6 @@
       }
     });
 
-    // تشغيل الواجهة الرئيسية عند فتح الرابط
     renderBotsGrid();
   </script>
 </body>
