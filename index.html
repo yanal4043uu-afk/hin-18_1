@@ -7,14 +7,14 @@
   <style>
     :root {
       --bg-main: #080b11;
-      --bg-header: rgba(15, 20, 31, 0.88);
+      --bg-header: rgba(15, 20, 31, 0.9);
+      --bg-sidebar: #0e131f;
       --bg-card: #121824;
-      --bg-card-hover: #182030;
       --bg-bot: rgba(24, 32, 48, 0.92);
       --bg-user: linear-gradient(135deg, #2563eb, #3b82f6);
       --bg-input: #141b29;
       --border-color: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.15);
+      --border-strong: rgba(255, 255, 255, 0.16);
       --text-primary: #f3f4f6;
       --text-action: #9ca3af;
       --text-quote: #ffffff;
@@ -22,6 +22,7 @@
       --accent-blue: #3b82f6;
       --danger: #ef4444;
       --success: #10b981;
+      --chat-font-size: 14.5px;
     }
 
     * {
@@ -51,41 +52,334 @@
       display: flex;
     }
 
+    /* ==================== القائمة الجانبية (Sidebar Drawer) ==================== */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 40;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 285px;
+      max-width: 82vw;
+      background-color: var(--bg-sidebar);
+      border-left: 1px solid var(--border-strong);
+      transform: translateX(105%);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-top {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), transparent);
+    }
+
+    .drawer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .drawer-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .drawer-brand-text h2 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .drawer-brand-text span {
+      font-size: 11px;
+      color: var(--text-action);
+    }
+
+    .close-drawer-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-action);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .drawer-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .drawer-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-action);
+      padding: 0 6px;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .drawer-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .drawer-item {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-primary);
+      padding: 10px 12px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      text-align: right;
+    }
+
+    .drawer-item:hover,
+    .drawer-item:active {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-color);
+    }
+
+    .drawer-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .drawer-badge {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    /* المحادثات النشطة داخل القائمة */
+    .recent-chat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+
+    .recent-chat-item img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: top center;
+      flex-shrink: 0;
+    }
+
+    .recent-chat-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .recent-chat-meta h4 {
+      font-size: 13px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-chat-meta p {
+      font-size: 11px;
+      color: var(--text-action);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* خيارات التخصيص في القائمة */
+    .pref-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: #cbd5e1;
+    }
+
+    .font-size-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .size-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-action);
+      padding: 4px 8px;
+      border-radius: 7px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .size-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .toggle-pill {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .toggle-pill.on {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
+
+    .drawer-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 8px;
+    }
+
+    .drawer-footer button {
+      flex: 1;
+      padding: 8px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--bg-input);
+      color: #cbd5e1;
+    }
+
+    .drawer-footer button.danger-btn {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
     /* ==================== 1. الواجهة الرئيسية (Lobby) ==================== */
     .home-header {
       background-color: var(--bg-header);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
-      padding: 12px 16px;
+      padding: 11px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       z-index: 10;
+    }
+
+    .header-right-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .menu-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 17px;
       color: #fff;
       letter-spacing: 0.3px;
-      flex-shrink: 0;
     }
 
     .brand-badge {
       background: linear-gradient(135deg, #6366f1, #ec4899);
-      padding: 3px 8px;
-      border-radius: 8px;
-      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 7px;
+      font-size: 10px;
       font-weight: 700;
     }
 
     .search-box {
       flex: 1;
-      max-width: 230px;
+      max-width: 200px;
     }
 
     .search-box input {
@@ -93,18 +387,16 @@
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 8px 13px;
       color: #fff;
-      font-size: 13px;
+      font-size: 12.5px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .search-box input:focus {
       border-color: var(--accent);
     }
 
-    /* شريط متابعة آخر محادثة */
     .continue-banner-wrap {
       padding: 12px 14px 2px;
       display: none;
@@ -124,11 +416,6 @@
       justify-content: space-between;
       gap: 10px;
       cursor: pointer;
-      transition: transform 0.15s;
-    }
-
-    .continue-card:active {
-      transform: scale(0.985);
     }
 
     .continue-info {
@@ -184,7 +471,6 @@
       flex-shrink: 0;
     }
 
-    /* شريط الفلاتر والتصنيفات */
     .filter-section {
       padding: 12px 14px 6px;
       background-color: var(--bg-main);
@@ -211,7 +497,6 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
-      transition: 0.18s;
     }
 
     .filter-pill.active {
@@ -221,7 +506,6 @@
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
-    /* شبكة بطاقات الشخصيات */
     .bots-grid-wrapper {
       flex: 1;
       overflow-y: auto;
@@ -251,12 +535,7 @@
       flex-direction: column;
       cursor: pointer;
       position: relative;
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .bot-card:hover {
-      border-color: var(--border-strong);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.18s ease, border-color 0.18s ease;
     }
 
     .bot-card:active {
@@ -371,7 +650,6 @@
       border-radius: 999px;
     }
 
-    /* بطاقة إضافة شخصية جديدة */
     .add-bot-card {
       background: rgba(18, 24, 36, 0.5);
       border: 1.5px dashed rgba(99, 102, 241, 0.35);
@@ -386,13 +664,6 @@
       min-height: 250px;
       gap: 10px;
       cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .add-bot-card:hover {
-      background: rgba(99, 102, 241, 0.08);
-      border-color: var(--accent);
-      color: #fff;
     }
 
     .add-icon-circle {
@@ -446,7 +717,7 @@
     .chat-header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
     }
 
@@ -626,7 +897,7 @@
       padding: 12px 15px;
       border-radius: 16px;
       line-height: 1.72;
-      font-size: 14.5px;
+      font-size: var(--chat-font-size);
       white-space: pre-wrap;
       word-wrap: break-word;
       backdrop-filter: blur(8px);
@@ -671,7 +942,6 @@
       color: #fca5a5;
     }
 
-    /* أزرار نسخ وحذف الرسالة */
     .msg-tools {
       display: flex;
       align-items: center;
@@ -696,11 +966,6 @@
       padding: 2px 8px;
       border-radius: 6px;
       cursor: pointer;
-    }
-
-    .mini-tool-btn:hover {
-      color: #fff;
-      border-color: var(--border-strong);
     }
 
     .rp-action {
@@ -741,6 +1006,10 @@
       scrollbar-width: none;
       position: relative;
       z-index: 2;
+    }
+
+    .quick-bar.hidden {
+      display: none;
     }
 
     .quick-bar::-webkit-scrollbar {
@@ -896,19 +1165,86 @@
 </head>
 <body>
 
+  <!-- ==================== القائمة الجانبية ==================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="drawer-top">
+      <div class="drawer-brand">
+        <div class="drawer-logo">Y</div>
+        <div class="drawer-brand-text">
+          <h2>Yollo RP</h2>
+          <span id="drawerStatsText">1 شخصية متاحة</span>
+        </div>
+      </div>
+      <button class="close-drawer-btn" id="closeDrawerBtn">✕</button>
+    </div>
+
+    <div class="drawer-scroll">
+      <div>
+        <div class="drawer-section-title">التنقل السريع</div>
+        <div class="drawer-nav-list">
+          <button class="drawer-item" id="navHomeBtn">
+            <span class="drawer-item-left">🏠 الرئيسية واستكشاف البوتات</span>
+          </button>
+          <button class="drawer-item" id="navCustomBtn">
+            <span class="drawer-item-left">⭐ الشخصيات المخصصة</span>
+            <span class="drawer-badge" id="customCountBadge">0</span>
+          </button>
+          <button class="drawer-item" id="navAddBotBtn">
+            <span class="drawer-item-left">➕ إضافة شخصية جديدة</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">المحادثات النشطة</div>
+        <div id="drawerRecentList"></div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">تخصيص الواجهة</div>
+        <div class="pref-box">
+          <div class="pref-row">
+            <span>حجم خط الرسائل</span>
+            <div class="font-size-group">
+              <button class="size-btn" data-size="13px">صغير</button>
+              <button class="size-btn active" data-size="14.5px">متوسط</button>
+              <button class="size-btn" data-size="16.5px">كبير</button>
+            </div>
+          </div>
+          <div class="pref-row">
+            <span>شريط الردود السريعة</span>
+            <button class="toggle-pill on" id="toggleQuickRepliesBtn">مفعّل</button>
+          </div>
+          <div class="pref-row">
+            <span>أصوات النقرات</span>
+            <button class="toggle-pill on" id="drawerSfxBtn">مفعّل</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button id="exportDataBtn">نسخ احتياطي</button>
+      <button class="danger-btn" id="resetAllDataBtn">تصفير الكل</button>
+    </div>
+  </aside>
+
   <!-- ==================== 1. الواجهة الرئيسية ==================== -->
   <section id="homeView" class="view active">
     <header class="home-header">
-      <div class="brand">
-        <span>Yollo RP</span>
-        <span class="brand-badge">FREE</span>
+      <div class="header-right-group">
+        <button class="menu-btn" id="openDrawerHomeBtn" title="القائمة">☰</button>
+        <div class="brand">
+          <span>Yollo RP</span>
+          <span class="brand-badge">FREE</span>
+        </div>
       </div>
       <div class="search-box">
         <input type="search" id="searchInput" placeholder="ابحث عن شخصية..." />
       </div>
     </header>
 
-    <!-- شريط متابعة المحادثة الجارية -->
     <div class="continue-banner-wrap" id="continueBannerWrap"></div>
 
     <div class="filter-section">
@@ -932,6 +1268,7 @@
 
     <header class="chat-header">
       <div class="chat-header-right">
+        <button class="back-btn" id="openDrawerChatBtn" title="القائمة">☰</button>
         <button class="back-btn" id="backBtn" title="العودة للرئيسية">→</button>
         <div class="bot-profile">
           <img class="header-avatar" id="chatHeaderAvatar" src="" alt="" />
@@ -945,7 +1282,6 @@
         </div>
       </div>
       <div class="header-controls">
-        <button class="icon-btn" id="sfxToggleBtn" title="صوت النقرات">🔔</button>
         <button class="icon-btn danger" id="clearBtn">مسح</button>
       </div>
     </header>
@@ -1002,6 +1338,8 @@
     const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v1";
     const STORAGE_KEY_LAST_BOT = "yollo_last_active_bot_id";
     const STORAGE_KEY_SFX = "yollo_ui_sfx_enabled";
+    const STORAGE_KEY_FONT = "yollo_ui_font_size";
+    const STORAGE_KEY_QUICK = "yollo_ui_quick_replies";
 
     const DEFAULT_BOTS = [
       {
@@ -1025,7 +1363,24 @@
       }
     ];
 
-    // عناصر الواجهة
+    // عناصر القائمة الجانبية
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const sidebarDrawer = document.getElementById("sidebarDrawer");
+    const openDrawerHomeBtn = document.getElementById("openDrawerHomeBtn");
+    const openDrawerChatBtn = document.getElementById("openDrawerChatBtn");
+    const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+    const drawerStatsText = document.getElementById("drawerStatsText");
+    const customCountBadge = document.getElementById("customCountBadge");
+    const drawerRecentList = document.getElementById("drawerRecentList");
+    const navHomeBtn = document.getElementById("navHomeBtn");
+    const navCustomBtn = document.getElementById("navCustomBtn");
+    const navAddBotBtn = document.getElementById("navAddBotBtn");
+    const toggleQuickRepliesBtn = document.getElementById("toggleQuickRepliesBtn");
+    const drawerSfxBtn = document.getElementById("drawerSfxBtn");
+    const exportDataBtn = document.getElementById("exportDataBtn");
+    const resetAllDataBtn = document.getElementById("resetAllDataBtn");
+
+    // عناصر الواجهة الرئيسية والمحادثة
     const homeView = document.getElementById("homeView");
     const chatView = document.getElementById("chatView");
     const ambientBg = document.getElementById("ambientBg");
@@ -1044,9 +1399,7 @@
     const statusText = document.getElementById("statusText");
     const quickBar = document.getElementById("quickBar");
     const clearBtn = document.getElementById("clearBtn");
-    const sfxToggleBtn = document.getElementById("sfxToggleBtn");
 
-    // عناصر نافذة الإضافة
     const addBotModal = document.getElementById("addBotModal");
     const cancelAddBotBtn = document.getElementById("cancelAddBotBtn");
     const saveNewBotBtn = document.getElementById("saveNewBotBtn");
@@ -1056,19 +1409,44 @@
     let messages = [];
     let isSending = false;
     let sfxEnabled = localStorage.getItem(STORAGE_KEY_SFX) !== "false";
+    let quickRepliesEnabled = localStorage.getItem(STORAGE_KEY_QUICK) !== "false";
+    let savedFontSize = localStorage.getItem(STORAGE_KEY_FONT) || "14.5px";
 
-    function updateSfxButton() {
-      sfxToggleBtn.textContent = sfxEnabled ? "🔔" : "🔕";
+    // تطبيق الإعدادات المحفوظة
+    function applyPreferences() {
+      document.documentElement.style.setProperty("--chat-font-size", savedFontSize);
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.size === savedFontSize);
+      });
+
+      quickBar.classList.toggle("hidden", !quickRepliesEnabled);
+      toggleQuickRepliesBtn.textContent = quickRepliesEnabled ? "مفعّل" : "مخفي";
+      toggleQuickRepliesBtn.classList.toggle("on", quickRepliesEnabled);
+
+      drawerSfxBtn.textContent = sfxEnabled ? "مفعّل" : "مكتوم";
+      drawerSfxBtn.classList.toggle("on", sfxEnabled);
     }
-    updateSfxButton();
 
-    sfxToggleBtn.addEventListener("click", () => {
-      sfxEnabled = !sfxEnabled;
-      localStorage.setItem(STORAGE_KEY_SFX, String(sfxEnabled));
-      updateSfxButton();
+    document.querySelectorAll(".size-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        savedFontSize = btn.dataset.size;
+        localStorage.setItem(STORAGE_KEY_FONT, savedFontSize);
+        applyPreferences();
+      });
     });
 
-    // صوت نقرة خفيف عبر Web Audio API دون ملفات خارجية
+    toggleQuickRepliesBtn.addEventListener("click", () => {
+      quickRepliesEnabled = !quickRepliesEnabled;
+      localStorage.setItem(STORAGE_KEY_QUICK, String(quickRepliesEnabled));
+      applyPreferences();
+    });
+
+    drawerSfxBtn.addEventListener("click", () => {
+      sfxEnabled = !sfxEnabled;
+      localStorage.setItem(STORAGE_KEY_SFX, String(sfxEnabled));
+      applyPreferences();
+    });
+
     function playUiPop(freq = 520) {
       if (!sfxEnabled) return;
       try {
@@ -1100,6 +1478,113 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
+
+    // ==================== التحكم بالقائمة الجانبية ====================
+    function openDrawer() {
+      updateDrawerContent();
+      drawerBackdrop.classList.add("open");
+      sidebarDrawer.classList.add("open");
+    }
+
+    function closeDrawer() {
+      drawerBackdrop.classList.remove("open");
+      sidebarDrawer.classList.remove("open");
+    }
+
+    function updateDrawerContent() {
+      const allBots = getAllBots();
+      const customCount = allBots.filter(b => b.isCustom).length;
+      drawerStatsText.textContent = `${allBots.length} شخصية متاحة`;
+      customCountBadge.textContent = String(customCount);
+
+      drawerRecentList.innerHTML = "";
+      let activeChatsCount = 0;
+
+      allBots.forEach(bot => {
+        const botMsgs = loadBotMessages(bot);
+        const hasUserMsg = botMsgs.some(m => m.role === "user");
+        if (!hasUserMsg) return;
+
+        activeChatsCount++;
+        const lastTxt = [...botMsgs].reverse().find(m => m.content)?.content.replace(/\*/g, "") || "";
+        const item = document.createElement("div");
+        item.className = "recent-chat-item";
+        item.innerHTML = `
+          <img src="${bot.avatarUrl}" alt="${escapeHtml(bot.name)}" />
+          <div class="recent-chat-meta">
+            <h4>${escapeHtml(bot.name)}</h4>
+            <p>${escapeHtml(lastTxt)}</p>
+          </div>
+        `;
+        item.onclick = () => {
+          closeDrawer();
+          openBotChat(bot);
+        };
+        drawerRecentList.appendChild(item);
+      });
+
+      if (activeChatsCount === 0) {
+        drawerRecentList.innerHTML = `<p style="font-size:12px; color:var(--text-action); padding:4px 6px;">لا توجد محادثات نشطة بعد.</p>`;
+      }
+    }
+
+    openDrawerHomeBtn.addEventListener("click", openDrawer);
+    openDrawerChatBtn.addEventListener("click", openDrawer);
+    closeDrawerBtn.addEventListener("click", closeDrawer);
+    drawerBackdrop.addEventListener("click", closeDrawer);
+
+    navHomeBtn.addEventListener("click", () => {
+      closeDrawer();
+      chatView.classList.remove("active");
+      homeView.classList.add("active");
+      activeCategory = "all";
+      categoryTabs.querySelectorAll(".filter-pill").forEach(b => {
+        b.classList.toggle("active", b.dataset.filter === "all");
+      });
+      renderBotsGrid();
+    });
+
+    navCustomBtn.addEventListener("click", () => {
+      closeDrawer();
+      chatView.classList.remove("active");
+      homeView.classList.add("active");
+      activeCategory = "custom";
+      categoryTabs.querySelectorAll(".filter-pill").forEach(b => {
+        b.classList.toggle("active", b.dataset.filter === "custom");
+      });
+      renderBotsGrid();
+    });
+
+    navAddBotBtn.addEventListener("click", () => {
+      closeDrawer();
+      addBotModal.classList.add("open");
+    });
+
+    exportDataBtn.addEventListener("click", async () => {
+      const backup = {
+        customBots: getAllBots().filter(b => b.isCustom),
+        chats: {}
+      };
+      getAllBots().forEach(b => {
+        backup.chats[b.botId] = loadBotMessages(b);
+      });
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(backup, null, 2));
+        alert("تم نسخ بيانات الشخصيات والمحادثات إلى الحافظة!");
+      } catch {
+        alert("تعذر النسخ التلقائي.");
+      }
+    });
+
+    resetAllDataBtn.addEventListener("click", () => {
+      if (confirm("هل أنت متأكد من مسح جميع المحادثات والشخصيات المخصصة؟")) {
+        localStorage.clear();
+        closeDrawer();
+        chatView.classList.remove("active");
+        homeView.classList.add("active");
+        renderBotsGrid();
+      }
+    });
 
     // ==================== شريط متابعة المحادثة ====================
     function renderContinueBanner() {
@@ -1193,7 +1678,6 @@
         botsGrid.appendChild(card);
       });
 
-      // بطاقة تفاعلية لإضافة بوت جديد
       const addCard = document.createElement("div");
       addCard.className = "add-bot-card";
       addCard.innerHTML = `
@@ -1481,7 +1965,6 @@
 
       contentWrap.appendChild(bubble);
 
-      // أزرار نسخ وحذف للرسائل النصية (بعد الرسائل الترحيبية)
       if (msg.type !== "image" && msg.content && index >= 1 && msg.role !== "error") {
         const tools = document.createElement("div");
         tools.className = "msg-tools";
@@ -1624,6 +2107,7 @@
       }
     });
 
+    applyPreferences();
     renderBotsGrid();
   </script>
 </body>
