@@ -2,188 +2,666 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محادثة Cow-Girl-Emma-148005</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cow Girl Emma — محادثة تفاعلية</title>
   <style>
-    * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
-    body {
+    :root {
+      --bg-main: #0b0f17;
+      --bg-header: #111827;
+      --bg-bot: #1a2234;
+      --bg-user: #2563eb;
+      --bg-input: #161e2e;
+      --border-color: #273248;
+      --text-primary: #f3f4f6;
+      --text-action: #9ca3af;
+      --text-quote: #ffffff;
+      --accent: #3b82f6;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      background: #0d1017;
-      color: #f3f4f6;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
     }
+
+    /* الشريط العلوي */
     header {
-      background: #161b26;
-      padding: 14px 18px;
-      border-bottom: 1px solid #242c3d;
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 10;
     }
-    .bot-info strong { color: #60a5fa; }
-    .status {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #143322;
-      color: #4ade80;
-      font-weight: bold;
-      font-size: 12px;
-    }
-    .status.offline {
-      background: #3b1518;
-      color: #f87171;
-    }
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px;
+
+    .bot-profile {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 12px;
     }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #fff;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .bot-info h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-action);
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    .status-dot.typing {
+      background-color: #f59e0b;
+      animation: pulse 1s infinite;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .icon-btn.danger {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* منطقة الرسائل */
+    #chatContainer {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 86%;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .msg-row.user {
+      align-self: flex-start;
+    }
+
+    .msg-row.bot {
+      align-self: flex-end;
+    }
+
     .bubble {
-      max-width: 78%;
-      padding: 11px 15px;
-      border-radius: 14px;
+      padding: 12px 15px;
+      border-radius: 16px;
       line-height: 1.65;
-      font-size: 14px;
+      font-size: 14.5px;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-    .user {
-      align-self: flex-start;
-      background: #2563eb;
-      color: #ffffff;
+
+    .msg-row.user .bubble {
+      background-color: var(--bg-user);
+      color: #fff;
       border-bottom-right-radius: 4px;
     }
-    .bot {
-      align-self: flex-end;
-      background: #1a202c;
-      color: #e5e7eb;
-      border: 1px solid #2d3748;
+
+    .msg-row.bot .bubble {
+      background-color: var(--bg-bot);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
       border-bottom-left-radius: 4px;
     }
-    .error {
-      align-self: center;
-      background: #3f161a;
+
+    .msg-row.error .bubble {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
       color: #fca5a5;
-      border: 1px solid #991b1b;
-      font-size: 13px;
     }
-    form {
+
+    /* تنسيق تقمص الأدوار */
+    .rp-action {
+      color: var(--text-action);
+      font-style: italic;
+    }
+
+    .rp-quote {
+      color: var(--text-quote);
+      font-weight: 600;
+    }
+
+    .msg-footer {
       display: flex;
-      gap: 10px;
-      padding: 12px 16px;
-      background: #161b26;
-      border-top: 1px solid #242c3d;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 5px;
+      padding: 0 4px;
     }
-    input {
-      flex: 1;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #2d3748;
-      background: #0d1017;
-      color: #ffffff;
-      font-size: 14px;
-      outline: none;
-    }
-    input:focus { border-color: #3b82f6; }
-    button {
-      padding: 0 22px;
-      border-radius: 10px;
-      border: none;
-      background: #2563eb;
-      color: #ffffff;
-      font-weight: bold;
+
+    .tts-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-action);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
       cursor: pointer;
-      font-size: 14px;
     }
-    button:hover { background: #1d4ed8; }
-    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .tts-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* مؤشر جاري الكتابة */
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px 2px;
+    }
+
+    .typing-dots span {
+      width: 7px;
+      height: 7px;
+      background-color: var(--text-action);
+      border-radius: 50%;
+      animation: bounce 1.3s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    /* أزرار الردود السريعة */
+    .quick-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 14px;
+      overflow-x: auto;
+      background-color: var(--bg-main);
+      border-top: 1px solid rgba(39, 50, 72, 0.5);
+      scrollbar-width: none;
+    }
+
+    .quick-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .chip:active {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
+    /* منطقة الإدخال */
+    .input-area {
+      background-color: var(--bg-header);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: #fff;
+      padding: 11px 14px;
+      font-size: 14.5px;
+      resize: none;
+      max-height: 110px;
+      min-height: 44px;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    #sendBtn {
+      background-color: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 18px;
+      height: 44px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* نافذة إعداد رابط السيرفر */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-header);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .modal h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      font-size: 12.5px;
+      color: var(--text-action);
+      margin-bottom: 12px;
+    }
+
+    .modal input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      direction: ltr;
+      margin-bottom: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
+
   <header>
-    <div class="bot-info">
-      البوت: <strong>Cow-Girl-Emma-148005</strong> | الجلسة: <strong>21702378</strong>
+    <div class="bot-profile">
+      <div class="avatar">E</div>
+      <div class="bot-info">
+        <h1>Cow Girl Emma</h1>
+        <div class="status-line">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">متصل • جاهز</span>
+        </div>
+      </div>
     </div>
-    <div id="status" class="status">جاهز</div>
+    <div class="header-actions">
+      <button class="icon-btn" id="settingsBtn">⚙️ السيرفر</button>
+      <button class="icon-btn danger" id="clearBtn">مسح</button>
+    </div>
   </header>
 
-  <div id="chat"></div>
+  <main id="chatContainer"></main>
 
-  <form id="form">
-    <input id="input" type="text" placeholder="اكتب رسالتك هنا..." autocomplete="off" required />
-    <button id="send" type="submit">إرسال</button>
-  </form>
+  <div class="quick-bar">
+    <button class="chip" data-text="مرحبا">مرحبا</button>
+    <button class="chip" data-text="*ينظر حوله في المزرعة*">*ينظر حوله*</button>
+    <button class="chip" data-text="أخبريني عن المزرعة">عن المزرعة</button>
+    <button class="chip" data-text="نعم، بكل تأكيد">نعم</button>
+    <button class="chip" data-text="استمري">استمري</button>
+  </div>
+
+  <div class="input-area">
+    <textarea id="msgInput" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
+    <button id="sendBtn">إرسال</button>
+  </div>
+
+  <!-- نافذة ضبط رابط Render -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <h2>رابط خادم المحادثة (Render)</h2>
+      <p>أدخل رابط السيرفر الأساسي بدون /api/chat في النهاية:</p>
+      <input type="url" id="apiUrlInput" placeholder="https://your-app.onrender.com" />
+      <div class="modal-actions">
+        <button class="icon-btn" id="closeModalBtn">إلغاء</button>
+        <button class="icon-btn" style="background: var(--accent); border-color: var(--accent);" id="saveApiBtn">حفظ</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const BACKEND_URL = "https://hin-18-1.onrender.com/api/chat";
+    // ضع رابط سيرفرك على Render هنا كقيمة افتراضية
+    const DEFAULT_API_BASE = "https://YOUR-RENDER-APP.onrender.com";
+    const STORAGE_KEY_CHAT = "yollo_custom_chat_v1";
+    const STORAGE_KEY_API = "yollo_custom_api_base";
 
-    const chatEl = document.getElementById("chat");
-    const formEl = document.getElementById("form");
-    const inputEl = document.getElementById("input");
-    const sendEl = document.getElementById("send");
-    const statusEl = document.getElementById("status");
+    const chatContainer = document.getElementById("chatContainer");
+    const msgInput = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
 
-    function setStatus(text, isOffline = false) {
-      statusEl.textContent = text;
-      statusEl.classList.toggle("offline", isOffline);
+    const settingsModal = document.getElementById("settingsModal");
+    const apiUrlInput = document.getElementById("apiUrlInput");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const saveApiBtn = document.getElementById("saveApiBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let apiBaseUrl = localStorage.getItem(STORAGE_KEY_API) || DEFAULT_API_BASE;
+    let messages = JSON.parse(localStorage.getItem(STORAGE_KEY_CHAT) || "[]");
+    let isSending = false;
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
-    function addMessage(text, role) {
-      const div = document.createElement("div");
-      div.className = `bubble ${role}`;
-      div.textContent = text;
-      chatEl.appendChild(div);
-      chatEl.scrollTop = chatEl.scrollHeight;
-      return div;
+    // تنسيق النجوم للحركات وعلامات التنصيص للحوار
+    function formatRoleplayText(rawText) {
+      let safe = escapeHtml(rawText);
+      safe = safe.replace(/\*([^*]+)\*/g, '<span class="rp-action">*$1*</span>');
+      safe = safe.replace(/"([^"]+)"/g, '<span class="rp-quote">"$1"</span>');
+      return safe;
     }
 
-    formEl.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const text = inputEl.value.trim();
-      if (!text) return;
+    // استخراج النص المنطوق فقط (بدون الحركات بين النجمتين) للقراءة الصوتية
+    function extractSpokenText(rawText) {
+      return rawText
+        .replace(/\*[^*]+\*/g, " ")
+        .replace(/["«»]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
 
-      addMessage(text, "user");
-      inputEl.value = "";
-      inputEl.disabled = true;
-      sendEl.disabled = true;
-      setStatus("جاري الإرسال...");
+    function speakText(text, btn) {
+      if (!("speechSynthesis" in window)) {
+        alert("متصفحك لا يدعم القراءة الصوتية.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const spoken = extractSpokenText(text) || text;
+      const utterance = new SpeechSynthesisUtterance(spoken);
+      utterance.lang = /[\u0600-\u06FF]/.test(spoken) ? "ar-SA" : "en-US";
+      utterance.rate = 1.0;
 
-      const typingEl = addMessage("يكتب...", "bot");
+      const originalLabel = btn.textContent;
+      btn.textContent = "🔊 جاري النطق...";
+      utterance.onend = () => { btn.textContent = originalLabel; };
+      utterance.onerror = () => { btn.textContent = originalLabel; };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setTypingState(active) {
+      isSending = active;
+      sendBtn.disabled = active;
+      if (active) {
+        statusDot.classList.add("typing");
+        statusText.textContent = "يكتب الآن...";
+      } else {
+        statusDot.classList.remove("typing");
+        statusText.textContent = "متصل • جاهز";
+      }
+    }
+
+    function saveMessages() {
+      localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(messages));
+    }
+
+    function renderMessage(msg, shouldScroll = true) {
+      const row = document.createElement("div");
+      row.className = `msg-row ${msg.role}`;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+
+      if (msg.role === "bot") {
+        bubble.innerHTML = formatRoleplayText(msg.content);
+      } else {
+        bubble.textContent = msg.content;
+      }
+
+      row.appendChild(bubble);
+
+      if (msg.role === "bot") {
+        const footer = document.createElement("div");
+        footer.className = "msg-footer";
+
+        const ttsBtn = document.createElement("button");
+        ttsBtn.className = "tts-btn";
+        ttsBtn.textContent = "🔊 استماع";
+        ttsBtn.onclick = () => speakText(msg.content, ttsBtn);
+
+        footer.appendChild(ttsBtn);
+        row.appendChild(footer);
+      }
+
+      chatContainer.appendChild(row);
+      if (shouldScroll) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    function renderAllMessages() {
+      chatContainer.innerHTML = "";
+      messages.forEach(m => renderMessage(m, false));
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function showTypingBubble() {
+      const row = document.createElement("div");
+      row.className = "msg-row bot";
+      row.id = "typingIndicator";
+      row.innerHTML = `
+        <div class="bubble">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+      `;
+      chatContainer.appendChild(row);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function removeTypingBubble() {
+      const el = document.getElementById("typingIndicator");
+      if (el) el.remove();
+    }
+
+    async function sendMessage(customText) {
+      const text = (customText ?? msgInput.value).trim();
+      if (!text || isSending) return;
+
+      if (apiBaseUrl.includes("YOUR-RENDER-APP")) {
+        settingsModal.classList.add("open");
+        apiUrlInput.focus();
+        return;
+      }
+
+      const userMsg = { role: "user", content: text };
+      messages.push(userMsg);
+      saveMessages();
+      renderMessage(userMsg);
+
+      msgInput.value = "";
+      msgInput.style.height = "44px";
+      setTypingState(true);
+      showTypingBubble();
 
       try {
-        const res = await fetch(BACKEND_URL, {
+        const endpoint = `${apiBaseUrl.replace(/\/+$/, "")}/api/chat`;
+        const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
         });
 
-        const data = await res.json();
-        typingEl.remove();
+        const data = await response.json();
+        removeTypingBubble();
 
-        if (!res.ok || data.ok === false) {
-          addMessage(data.error || "حدث خطأ أثناء الاتصال بالنموذج", "error");
-          setStatus("خطأ في الرد", true);
-          return;
+        if (!response.ok || !data.ok) {
+          const errText = data.reply || data.error || "حدث خطأ أثناء الاتصال بالنموذج";
+          renderMessage({ role: "error", content: errText });
+        } else {
+          const botMsg = { role: "bot", content: data.reply };
+          messages.push(botMsg);
+          saveMessages();
+          renderMessage(botMsg);
         }
-
-        addMessage(data.reply || "لم يصل نص رد من النموذج", "bot");
-        setStatus("متصل");
       } catch (err) {
-        typingEl.remove();
-        addMessage("تعذر الوصول إلى الخادم على Render — تأكد من رابط BACKEND_URL وتشغيل الخدمة", "error");
-        setStatus("غير متصل", true);
+        removeTypingBubble();
+        renderMessage({
+          role: "error",
+          content: "تعذر الوصول إلى السيرفر. تأكد من رابط Render أو أن الخادم نشط."
+        });
       } finally {
-        inputEl.disabled = false;
-        sendEl.disabled = false;
-        inputEl.focus();
+        setTypingState(false);
+      }
+    }
+
+    // ضبط ارتفاع مربع النص تلقائياً
+    msgInput.addEventListener("input", () => {
+      msgInput.style.height = "44px";
+      msgInput.style.height = Math.min(msgInput.scrollHeight, 110) + "px";
+    });
+
+    msgInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
       }
     });
+
+    sendBtn.addEventListener("click", () => sendMessage());
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        sendMessage(chip.dataset.text);
+      });
+    });
+
+    settingsBtn.addEventListener("click", () => {
+      apiUrlInput.value = apiBaseUrl.includes("YOUR-RENDER-APP") ? "" : apiBaseUrl;
+      settingsModal.classList.add("open");
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      settingsModal.classList.remove("open");
+    });
+
+    saveApiBtn.addEventListener("click", () => {
+      const val = apiUrlInput.value.trim();
+      if (val) {
+        apiBaseUrl = val.replace(/\/+$/, "");
+        localStorage.setItem(STORAGE_KEY_API, apiBaseUrl);
+        settingsModal.classList.remove("open");
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      if (confirm("هل تريد مسح سجل المحادثة من الشاشة؟")) {
+        messages = [];
+        saveMessages();
+        renderAllMessages();
+      }
+    });
+
+    renderAllMessages();
   </script>
 </body>
 </html>
