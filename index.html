@@ -201,7 +201,7 @@
       border-radius: 999px;
     }
 
-    /* المحادثات النشطة داخل القائمة */
+    /* المحادثات النشطة داخل القائمة الجانبية */
     .recent-chat-item {
       display: flex;
       align-items: center;
@@ -215,8 +215,8 @@
     }
 
     .recent-chat-item img {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: cover;
       object-position: top center;
@@ -395,80 +395,6 @@
 
     .search-box input:focus {
       border-color: var(--accent);
-    }
-
-    .continue-banner-wrap {
-      padding: 12px 14px 2px;
-      display: none;
-    }
-
-    .continue-banner-wrap.visible {
-      display: block;
-    }
-
-    .continue-card {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(30, 41, 59, 0.7));
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      border-radius: 14px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      cursor: pointer;
-    }
-
-    .continue-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .continue-info img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: top center;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      flex-shrink: 0;
-    }
-
-    .continue-text {
-      min-width: 0;
-    }
-
-    .continue-label {
-      font-size: 10.5px;
-      color: #a5b4fc;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .continue-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .continue-preview {
-      font-size: 11.5px;
-      color: var(--text-action);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .continue-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 13px;
-      font-size: 12px;
-      font-weight: 600;
-      flex-shrink: 0;
     }
 
     .filter-section {
@@ -1197,7 +1123,7 @@
       </div>
 
       <div>
-        <div class="drawer-section-title">المحادثات النشطة</div>
+        <div class="drawer-section-title">سجل المحادثات النشطة</div>
         <div id="drawerRecentList"></div>
       </div>
 
@@ -1244,8 +1170,6 @@
         <input type="search" id="searchInput" placeholder="ابحث عن شخصية..." />
       </div>
     </header>
-
-    <div class="continue-banner-wrap" id="continueBannerWrap"></div>
 
     <div class="filter-section">
       <div class="pill-tabs" id="categoryTabs">
@@ -1336,7 +1260,6 @@
   <script>
     const API_BASE_URL = "https://hin-18-1.onrender.com";
     const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v1";
-    const STORAGE_KEY_LAST_BOT = "yollo_last_active_bot_id";
     const STORAGE_KEY_SFX = "yollo_ui_sfx_enabled";
     const STORAGE_KEY_FONT = "yollo_ui_font_size";
     const STORAGE_KEY_QUICK = "yollo_ui_quick_replies";
@@ -1384,7 +1307,6 @@
     const homeView = document.getElementById("homeView");
     const chatView = document.getElementById("chatView");
     const ambientBg = document.getElementById("ambientBg");
-    const continueBannerWrap = document.getElementById("continueBannerWrap");
     const botsGrid = document.getElementById("botsGrid");
     const searchInput = document.getElementById("searchInput");
     const categoryTabs = document.getElementById("categoryTabs");
@@ -1412,7 +1334,6 @@
     let quickRepliesEnabled = localStorage.getItem(STORAGE_KEY_QUICK) !== "false";
     let savedFontSize = localStorage.getItem(STORAGE_KEY_FONT) || "14.5px";
 
-    // تطبيق الإعدادات المحفوظة
     function applyPreferences() {
       document.documentElement.style.setProperty("--chat-font-size", savedFontSize);
       document.querySelectorAll(".size-btn").forEach(btn => {
@@ -1586,47 +1507,8 @@
       }
     });
 
-    // ==================== شريط متابعة المحادثة ====================
-    function renderContinueBanner() {
-      const lastBotId = Number(localStorage.getItem(STORAGE_KEY_LAST_BOT));
-      if (!lastBotId) {
-        continueBannerWrap.classList.remove("visible");
-        return;
-      }
-      const bot = getAllBots().find(b => b.botId === lastBotId);
-      if (!bot) {
-        continueBannerWrap.classList.remove("visible");
-        return;
-      }
-      const savedMsgs = loadBotMessages(bot);
-      const hasUserHistory = savedMsgs.some(m => m.role === "user");
-      if (!hasUserHistory) {
-        continueBannerWrap.classList.remove("visible");
-        return;
-      }
-      const lastTextMsg = [...savedMsgs].reverse().find(m => m.content);
-      const preview = lastTextMsg ? lastTextMsg.content.replace(/\*/g, "") : "متابعة المحادثة...";
-
-      continueBannerWrap.innerHTML = `
-        <div class="continue-card" id="resumeChatCard">
-          <div class="continue-info">
-            <img src="${bot.avatarUrl}" alt="${escapeHtml(bot.name)}" />
-            <div class="continue-text">
-              <div class="continue-label">متابعة المحادثة السابقة</div>
-              <div class="continue-title">${escapeHtml(bot.name)}</div>
-              <div class="continue-preview">${escapeHtml(preview)}</div>
-            </div>
-          </div>
-          <button class="continue-btn">متابعة</button>
-        </div>
-      `;
-      continueBannerWrap.classList.add("visible");
-      document.getElementById("resumeChatCard").onclick = () => openBotChat(bot);
-    }
-
     // ==================== الشبكة الرئيسية ====================
     function renderBotsGrid() {
-      renderContinueBanner();
       const query = searchInput.value.trim().toLowerCase();
       botsGrid.innerHTML = "";
 
@@ -1790,8 +1672,6 @@
 
     function openBotChat(bot) {
       currentBot = bot;
-      localStorage.setItem(STORAGE_KEY_LAST_BOT, String(bot.botId));
-
       chatHeaderAvatar.src = bot.avatarUrl;
       chatHeaderAvatar.alt = bot.name;
       chatHeaderName.textContent = bot.name;
