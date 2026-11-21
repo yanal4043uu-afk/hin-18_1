@@ -67,7 +67,7 @@
       display: flex;
     }
 
-    /* ==================== حركات الإيموجيات (CSS Emoji Animations) ==================== */
+    /* ==================== حركات الإيموجيات ==================== */
     .anim-emoji {
       display: inline-block;
       transform-origin: center;
@@ -103,7 +103,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* ==================== القائمة الجانبية (Sidebar Drawer) ==================== */
+    /* ==================== القائمة الجانبية ==================== */
     .drawer-backdrop {
       position: fixed;
       inset: 0;
@@ -190,12 +190,6 @@
       border-radius: 10px;
       font-size: 14px;
       cursor: pointer;
-      transition: 0.15s;
-    }
-
-    .close-drawer-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #fff;
     }
 
     .drawer-scroll {
@@ -237,23 +231,12 @@
       font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.18s, border-color 0.18s, transform 0.15s;
       text-align: right;
-    }
-
-    .drawer-item:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: var(--border-strong);
     }
 
     .drawer-item.create-highlight {
       background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent-secondary) 12%, transparent));
       border-color: color-mix(in srgb, var(--accent) 48%, transparent);
-      box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 16%, transparent);
-    }
-
-    .drawer-item:active {
-      transform: scale(0.985);
     }
 
     .drawer-item-left {
@@ -284,12 +267,6 @@
       border: 1px solid var(--border-color);
       cursor: pointer;
       margin-bottom: 8px;
-      transition: 0.18s;
-    }
-
-    .recent-chat-item:hover {
-      background: rgba(255, 255, 255, 0.055);
-      border-color: var(--border-strong);
     }
 
     .recent-chat-item.pinned {
@@ -357,16 +334,8 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: 0.15s;
     }
 
-    .dots-menu-btn:hover {
-      background: color-mix(in srgb, var(--accent) 25%, transparent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    /* القائمة المنسدلة للثلاث نقاط */
     .chat-context-menu {
       position: fixed;
       background: #131b2b;
@@ -413,7 +382,7 @@
       background: rgba(239, 68, 68, 0.16);
     }
 
-    /* ==================== 1. الواجهة الرئيسية (Lobby) ==================== */
+    /* ==================== 1. الواجهة الرئيسية ==================== */
     .home-header {
       background-color: var(--bg-header);
       backdrop-filter: blur(14px);
@@ -479,11 +448,6 @@
       color: #fff;
       font-size: 12.5px;
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .search-box input:focus {
-      border-color: var(--accent);
     }
 
     .filter-section {
@@ -512,7 +476,6 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
-      transition: 0.18s;
     }
 
     .filter-pill.active {
@@ -551,12 +514,7 @@
       flex-direction: column;
       cursor: pointer;
       position: relative;
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .bot-card:hover {
-      border-color: var(--border-strong);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+      transition: transform 0.18s ease, border-color 0.18s ease;
     }
 
     .bot-card:active {
@@ -583,7 +541,6 @@
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 999px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
     }
 
     .lock-badge {
@@ -689,7 +646,7 @@
       font-size: 13.5px;
     }
 
-    /* ==================== 2. واجهة المحادثة (Chat View) ==================== */
+    /* ==================== 2. واجهة المحادثة ==================== */
     .ambient-bg {
       position: absolute;
       inset: 0;
@@ -700,7 +657,6 @@
       pointer-events: none;
       z-index: 0;
       transform: scale(1.12);
-      transition: opacity 0.25s ease;
     }
 
     header.chat-header {
@@ -1005,7 +961,6 @@
     .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
 
-    /* شريط الردود السريعة */
     .quick-bar {
       display: flex;
       gap: 7px;
@@ -1037,7 +992,6 @@
       cursor: pointer;
     }
 
-    /* شريط أدوات التنسيق السريع */
     .format-toolbar {
       display: flex;
       align-items: center;
@@ -1061,11 +1015,6 @@
       padding: 4px 10px;
       border-radius: 7px;
       cursor: pointer;
-    }
-
-    .fmt-btn:active {
-      background: var(--accent);
-      color: #fff;
     }
 
     .input-area {
@@ -1092,10 +1041,6 @@
       min-height: 42px;
       outline: none;
       line-height: 1.4;
-    }
-
-    textarea:focus {
-      border-color: var(--accent);
     }
 
     #sendBtn {
@@ -1200,7 +1145,6 @@
       margin-top: 6px;
     }
 
-    /* معاينة الشخصية */
     .preview-top {
       display: flex;
       align-items: center;
@@ -1264,7 +1208,6 @@
       cursor: pointer;
     }
 
-    /* نافذة الإعدادات الاحترافية */
     .settings-group {
       background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--border-color);
@@ -1302,7 +1245,6 @@
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
-      transition: transform 0.15s;
     }
 
     .swatch-btn.active {
@@ -1545,11 +1487,11 @@
       <div class="modal-row">
         <div>
           <label>اسمك في المحادثة</label>
-          <input type="text" id="personaNameInput" placeholder="مثال: يزن" />
+          <input type="text" id="personaNameInput" placeholder="مثال: ينال" />
         </div>
         <div>
           <label>لقبك / صفتك</label>
-          <input type="text" id="personaTitleInput" placeholder="مثال: المالك الجديد للمزرعة" />
+          <input type="text" id="personaTitleInput" placeholder="مثال: مالك المزرعة الجديد" />
         </div>
       </div>
       <div class="modal-row">
@@ -1655,10 +1597,7 @@
   </div>
 
   <script>
-    // إعدادات الاتصال الداخلية المخفية تماماً عن الواجهة
     const API_BASE_URL = "https://hin-18-1.onrender.com";
-    const INTERNAL_BOT_ID = 148005;
-    const INTERNAL_SESSION_ID = 21702378;
     const FALLBACK_AVATAR = "https://d.top4top.io/p_39776f6w21.jpg";
 
     const STORAGE_KEY_CUSTOM_BOTS = "yollo_custom_bots_list_v4";
@@ -1667,11 +1606,9 @@
     const STORAGE_KEY_BOT_PERSONAS = "yollo_per_bot_personas_v1";
     const STORAGE_KEY_PREFS = "yollo_ui_preferences_v2";
 
-    // ذاكرة مؤقتة للصفحة فقط (تُمسح تلقائياً عند إغلاق الموقع أو الخروج منه والعودة)
     const unlockedBotsInMemory = new Set();
     let hiddenTimestamp = 0;
 
-    // إعادة القفل تلقائياً إذا رجع المستخدم للموقع من الخلفية أو من ذاكرة التخزين المؤقت للصفحات
     window.addEventListener("pageshow", (event) => {
       if (event.persisted) {
         unlockedBotsInMemory.clear();
@@ -1687,7 +1624,6 @@
       if (document.hidden) {
         hiddenTimestamp = Date.now();
       } else if (hiddenTimestamp && Date.now() - hiddenTimestamp > 3000) {
-        // إذا غادر المستخدم التطبيق/المتصفح لأكثر من 3 ثوانٍ وعاد، يُعاد تفعيل القفل
         unlockedBotsInMemory.clear();
         hiddenTimestamp = 0;
         if (currentBot && getBotChatMeta(currentBot.id).password) {
@@ -1735,7 +1671,6 @@
       }
     ];
 
-    // عناصر القائمة الجانبية والنوافذ
     const drawerBackdrop = document.getElementById("drawerBackdrop");
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const openDrawerHomeBtn = document.getElementById("openDrawerHomeBtn");
@@ -1751,7 +1686,6 @@
     const navCustomBtn = document.getElementById("navCustomBtn");
     const navSettingsBtn = document.getElementById("navSettingsBtn");
 
-    // قائمة خيارات الثلاث نقاط
     const chatContextMenu = document.getElementById("chatContextMenu");
     const ctxPinBtn = document.getElementById("ctxPinBtn");
     const ctxLockBtn = document.getElementById("ctxLockBtn");
@@ -1759,7 +1693,6 @@
     const ctxPersonaBtn = document.getElementById("ctxPersonaBtn");
     const ctxDeleteBtn = document.getElementById("ctxDeleteBtn");
 
-    // نافذة كلمة السر
     const lockModal = document.getElementById("lockModal");
     const lockModalTitle = document.getElementById("lockModalTitle");
     const lockModalDesc = document.getElementById("lockModalDesc");
@@ -1767,7 +1700,6 @@
     const cancelLockBtn = document.getElementById("cancelLockBtn");
     const confirmLockBtn = document.getElementById("confirmLockBtn");
 
-    // عناصر نافذة البيرسونا الخاصة بكل بوت
     const personaModal = document.getElementById("personaModal");
     const personaModalTitle = document.getElementById("personaModalTitle");
     const personaNameInput = document.getElementById("personaNameInput");
@@ -1778,7 +1710,6 @@
     const cancelPersonaBtn = document.getElementById("cancelPersonaBtn");
     const savePersonaBtn = document.getElementById("savePersonaBtn");
 
-    // عناصر الإعدادات
     const settingsModal = document.getElementById("settingsModal");
     const closeSettingsBtn = document.getElementById("closeSettingsBtn");
     const toggleQuickRepliesBtn = document.getElementById("toggleQuickRepliesBtn");
@@ -1788,7 +1719,6 @@
     const exportDataBtn = document.getElementById("exportDataBtn");
     const resetAllDataBtn = document.getElementById("resetAllDataBtn");
 
-    // عناصر الواجهة الرئيسية والمحادثة
     const homeView = document.getElementById("homeView");
     const chatView = document.getElementById("chatView");
     const ambientBg = document.getElementById("ambientBg");
@@ -1808,7 +1738,6 @@
     const formatToolbar = document.getElementById("formatToolbar");
     const clearBtn = document.getElementById("clearBtn");
 
-    // عناصر معاينة الشخصية ومحرر الشخصيات
     const previewModal = document.getElementById("previewModal");
     const previewAvatar = document.getElementById("previewAvatar");
     const previewName = document.getElementById("previewName");
@@ -1942,7 +1871,37 @@
       } catch {}
     }
 
-    // ==================== إدارة فتح كلمة السر لمرة واحدة في الزيارة ====================
+    // ==================== دوال الاتصال بمسارات الحذف على السيرفر ====================
+    async function deleteRemoteMessage(serverId) {
+      if (!serverId) return;
+      try {
+        await fetch(`${API_BASE_URL.replace(/\/+$/, "")}/api/delete-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messageId: String(serverId) })
+        });
+      } catch (err) {
+        console.warn("Delete message sync error:", err);
+      }
+    }
+
+    async function clearRemoteSession(botMessages = messages) {
+      const messageIds = botMessages
+        .map(m => m.serverId)
+        .filter(Boolean);
+
+      try {
+        await fetch(`${API_BASE_URL.replace(/\/+$/, "")}/api/clear`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messageIds })
+        });
+      } catch (err) {
+        console.warn("Clear session sync error:", err);
+      }
+    }
+
+    // ==================== إدارة قفل كلمة السر والجلسات ====================
     function isBotUnlockedThisSession(botId) {
       return unlockedBotsInMemory.has(String(botId));
     }
@@ -1956,7 +1915,6 @@
       }
     }
 
-    // ==================== إدارة بيانات الجلسات النشطة ====================
     function getAllChatMeta() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY_CHAT_META) || "{}");
@@ -2042,7 +2000,6 @@
       personaBotTarget = null;
     });
 
-    // ==================== إدارة الشخصيات والتعديلات ====================
     function getBotOverrides() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY_BOT_OVERRIDES) || "{}");
@@ -2126,7 +2083,7 @@
       } else {
         lockActionState = { mode: "set", bot };
         lockModalTitle.textContent = "🔒 قفل المحادثة بكلمة سر";
-        lockModalDesc.textContent = `اختر كلمة سر لقفل محادثة "${bot.name}" (ستُطلب عند خروجك وعودتك للموقع):`;
+        lockModalDesc.textContent = `اختر كلمة سر لقفل محادثة "${bot.name}":`;
       }
       lockPasswordInput.value = "";
       lockModal.classList.add("open");
@@ -2149,12 +2106,15 @@
       openPersonaModalForBot(bot);
     });
 
-    ctxDeleteBtn.addEventListener("click", () => {
+    ctxDeleteBtn.addEventListener("click", async () => {
       if (!contextMenuBot) return;
       const bot = contextMenuBot;
       closeContextMenu();
 
-      if (confirm(`هل تريد حذف سجل محادثة "${bot.name}" بشكل نهائي؟`)) {
+      if (confirm(`هل تريد حذف سجل محادثة "${bot.name}" بشكل نهائي من السيرفر؟`)) {
+        const botMsgs = loadBotMessages(bot);
+        await clearRemoteSession(botMsgs);
+
         localStorage.removeItem(getStorageKey(bot));
         removeBotChatMeta(bot.id);
 
@@ -2168,7 +2128,6 @@
       }
     });
 
-    // منطق نافذة كلمة السر
     cancelLockBtn.addEventListener("click", () => {
       lockModal.classList.remove("open");
       lockActionState = null;
@@ -2187,12 +2146,11 @@
 
       if (mode === "set") {
         updateBotChatMeta(bot.id, { password: pass });
-        // تبقى مفتوحة حالياً أثناء جلستك الحالية، وتُقفل تلقائياً عند خروجك وعودتك للموقع
         markBotUnlockedThisSession(bot.id, true);
         lockModal.classList.remove("open");
         lockActionState = null;
         renderBotsGrid();
-        alert(`تم قفل محادثة "${bot.name}" بكلمة سر بنجاح. ستُطلب عند عودتك للموقع.`);
+        alert(`تم قفل محادثة "${bot.name}" بكلمة سر بنجاح.`);
       } else if (mode === "remove") {
         if (pass !== meta.password) {
           alert("كلمة السر غير صحيحة!");
@@ -2291,7 +2249,7 @@
       });
 
       if (activeBots.length === 0) {
-        drawerRecentList.innerHTML = `<p style="font-size:12px; color:var(--text-action); padding:4px 6px;">لا توجد محادثات نشطة بعد. اختر شخصية واضغط "ابدأ المحادثة الآن".</p>`;
+        drawerRecentList.innerHTML = `<p style="font-size:12px; color:var(--text-action); padding:4px 6px;">لا توجد محادثات نشطة بعد.</p>`;
       }
     }
 
@@ -2353,8 +2311,9 @@
       }
     });
 
-    resetAllDataBtn.addEventListener("click", () => {
+    resetAllDataBtn.addEventListener("click", async () => {
       if (confirm("هل أنت متأكد من مسح جميع المحادثات والتعديلات؟")) {
+        await clearRemoteSession(messages);
         localStorage.clear();
         unlockedBotsInMemory.clear();
         settingsModal.classList.remove("open");
@@ -2915,7 +2874,15 @@
         const delBtn = document.createElement("button");
         delBtn.className = "mini-tool-btn";
         delBtn.textContent = "حذف";
-        delBtn.onclick = () => {
+        delBtn.onclick = async () => {
+          const targetMsg = messages[index];
+          delBtn.textContent = "جاري الحذف...";
+          delBtn.disabled = true;
+
+          if (targetMsg && targetMsg.serverId) {
+            await deleteRemoteMessage(targetMsg.serverId);
+          }
+
           messages.splice(index, 1);
           saveMessages();
           renderAllMessages();
@@ -2967,23 +2934,26 @@
       if (!currentBot) return rawUserText;
       const p = getBotPersona(currentBot.id);
       const parts = [
-        p.name ? `اسمي: ${p.name}` : "",
-        p.title ? `لقبي/صفتي: ${p.title}` : "",
-        p.appearance ? `مظهري/عمري: ${p.appearance}` : "",
-        p.tone ? `أسلوب تعاملي: ${p.tone}` : "",
-        p.bio ? `خلفيتي: ${p.bio}` : ""
+        p.name ? `اسم الشخص الذي تتحدثين معه هو "${p.name}" (أنتِ تعرفين اسمه مسبقاً وناديه به في الحوار)` : "",
+        p.title ? `صفته: ${p.title}` : "",
+        p.appearance ? `مظهره: ${p.appearance}` : "",
+        p.tone ? `طبعه وأسلوبه: ${p.tone}` : "",
+        p.bio ? `معلومات إضافية عنه: ${p.bio}` : ""
       ].filter(Boolean);
 
       if (parts.length === 0) return rawUserText;
-      return `[هوية المستخدم في القصة: ${parts.join(" | ")}]\n${rawUserText}`;
+      return `(ملاحظة سياق للشخصية - التزمي بها في ردودك: ${parts.join("، ")})\n${rawUserText}`;
     }
 
     async function regenerateLastReply() {
       if (isSending || !lastUserPromptText || !currentBot) return;
       if (messages.length > 0 && messages[messages.length - 1].role === "bot") {
-        messages.pop();
+        const removedBotMsg = messages.pop();
         saveMessages();
         renderAllMessages();
+        if (removedBotMsg && removedBotMsg.serverId) {
+          await deleteRemoteMessage(removedBotMsg.serverId);
+        }
       }
       await fetchBotReply(lastUserPromptText);
     }
@@ -2994,7 +2964,7 @@
 
       playUiPop(580);
       lastUserPromptText = text;
-      const userMsg = { role: "user", type: "text", content: text };
+      const userMsg = { role: "user", type: "text", content: text, serverId: null };
       messages.push(userMsg);
       saveMessages();
       renderAllMessages();
@@ -3014,9 +2984,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            message: buildPayloadMessage(userText),
-            botId: INTERNAL_BOT_ID,
-            sessionId: INTERNAL_SESSION_ID
+            message: buildPayloadMessage(userText)
           })
         });
 
@@ -3028,7 +2996,23 @@
           renderMessage({ role: "error", type: "text", content: errText }, -1);
         } else {
           playUiPop(440);
-          const botMsg = { role: "bot", type: "text", content: data.reply };
+
+          // حفظ serverId لرسالة المستخدم الأخيرة إن وُجد
+          if (data.userMsgId) {
+            for (let i = messages.length - 1; i >= 0; i--) {
+              if (messages[i].role === "user") {
+                messages[i].serverId = String(data.userMsgId);
+                break;
+              }
+            }
+          }
+
+          const botMsg = {
+            role: "bot",
+            type: "text",
+            content: data.reply,
+            serverId: data.botMsgId ? String(data.botMsgId) : null
+          };
           messages.push(botMsg);
           saveMessages();
           renderAllMessages();
@@ -3059,13 +3043,17 @@
 
     sendBtn.addEventListener("click", () => sendMessage());
 
-    clearBtn.addEventListener("click", () => {
+    clearBtn.addEventListener("click", async () => {
       if (!currentBot) return;
-      if (confirm("هل تريد إعادة المحادثة إلى البداية؟")) {
+      if (confirm("هل تريد مسح محتوى المحادثة نهائياً من السيرفر والبدء من جديد؟")) {
+        statusText.textContent = "جاري مسح السجل...";
+        await clearRemoteSession(messages);
+
         messages = getDefaultMessages(currentBot);
         lastUserPromptText = "";
         saveMessages();
         renderAllMessages();
+        statusText.textContent = "متصل • جاهز";
       }
     });
 
