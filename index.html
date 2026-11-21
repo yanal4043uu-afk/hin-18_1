@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Cow Girl Emma — محادثة تفاعلية</title>
+  <title>Yollo RP — استكشاف الشخصيات</title>
   <style>
     :root {
-      --bg-main: #0b0f17;
-      --bg-header: #111827;
+      --bg-main: #090c12;
+      --bg-header: #101520;
+      --bg-card: #141a26;
+      --bg-card-hover: #1b2333;
       --bg-bot: #1a2234;
       --bg-user: #2563eb;
       --bg-input: #161e2e;
-      --border-color: #273248;
+      --border-color: #242e42;
       --text-primary: #f3f4f6;
       --text-action: #9ca3af;
       --text-quote: #ffffff;
-      --accent: #3b82f6;
+      --accent: #6366f1;
+      --accent-blue: #3b82f6;
       --danger: #ef4444;
       --success: #10b981;
     }
@@ -25,22 +28,274 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background-color: var(--bg-main);
       color: var(--text-primary);
-      display: flex;
-      flex-direction: column;
       height: 100dvh;
       overflow: hidden;
     }
 
-    /* الشريط العلوي */
-    header {
+    .view {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    /* ==================== الواجهة الرئيسية (Lobby) ==================== */
+    .home-header {
       background-color: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 10px 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 220px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 7px 14px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    /* شريط الفلاتر والتصنيفات */
+    .filter-section {
+      padding: 12px 14px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: var(--bg-main);
+    }
+
+    .pill-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .pill-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-action);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .filter-pill.active {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* شبكة بطاقات الشخصيات */
+    .bots-grid-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px 24px;
+    }
+
+    .bots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .bots-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 960px) {
+      .bots-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .bot-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .bot-card:active {
+      transform: scale(0.98);
+      border-color: var(--accent);
+    }
+
+    .card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 3.6;
+      background-color: #1c2436;
+      overflow: hidden;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+
+    .card-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(20, 26, 38, 0.95) 0%, transparent 42%);
+      pointer-events: none;
+    }
+
+    .chat-count-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 2;
+      background: rgba(11, 15, 23, 0.72);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      direction: ltr;
+    }
+
+    .card-body {
+      padding: 10px 11px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-action);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: auto;
+      padding-top: 4px;
+      direction: rtl;
+    }
+
+    .tag-chip {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    .coming-soon-card {
+      background: rgba(20, 26, 38, 0.45);
+      border: 1px dashed var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 12px;
+      color: var(--text-action);
+      min-height: 240px;
+      gap: 8px;
+    }
+
+    .coming-soon-card span {
+      font-size: 26px;
+    }
+
+    .coming-soon-card p {
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    /* ==================== واجهة المحادثة (Chat View) ==================== */
+    header.chat-header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -48,15 +303,36 @@
       z-index: 10;
     }
 
+    .chat-header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
     .bot-profile {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .header-avatar {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
       object-position: top center;
@@ -66,7 +342,7 @@
     }
 
     .bot-info h1 {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 700;
       color: #fff;
     }
@@ -75,7 +351,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-action);
       margin-top: 2px;
     }
@@ -100,11 +376,6 @@
       border-radius: 8px;
       font-size: 12px;
       cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .icon-btn:active {
-      transform: scale(0.96);
     }
 
     .icon-btn.danger {
@@ -112,7 +383,6 @@
       border-color: rgba(239, 68, 68, 0.35);
     }
 
-    /* منطقة الرسائل */
     #chatContainer {
       flex: 1;
       overflow-y: auto;
@@ -123,7 +393,6 @@
       scroll-behavior: smooth;
     }
 
-    /* بطاقة تعريف الشخصية في أعلى المحادثة */
     .character-intro {
       display: flex;
       flex-direction: column;
@@ -161,7 +430,6 @@
       direction: ltr;
     }
 
-    /* صفوف الرسائل */
     .msg-row {
       display: flex;
       align-items: flex-start;
@@ -240,7 +508,6 @@
       color: #fca5a5;
     }
 
-    /* تنسيق تقمص الأدوار */
     .rp-action {
       color: var(--text-action);
       font-style: italic;
@@ -251,7 +518,6 @@
       font-weight: 600;
     }
 
-    /* مؤشر جاري الكتابة */
     .typing-dots {
       display: inline-flex;
       gap: 4px;
@@ -269,7 +535,6 @@
     .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
 
-    /* شريط الأزرار السريعة الذكي */
     .quick-bar {
       display: flex;
       gap: 8px;
@@ -293,16 +558,13 @@
       font-size: 12.5px;
       white-space: nowrap;
       cursor: pointer;
-      transition: 0.15s;
     }
 
     .chip:active {
-      background-color: var(--accent);
+      background-color: var(--accent-blue);
       color: #fff;
-      border-color: var(--accent);
     }
 
-    /* منطقة الإدخال */
     .input-area {
       background-color: var(--bg-header);
       border-top: 1px solid var(--border-color);
@@ -328,11 +590,11 @@
     }
 
     textarea:focus {
-      border-color: var(--accent);
+      border-color: var(--accent-blue);
     }
 
     #sendBtn {
-      background-color: var(--accent);
+      background-color: var(--accent-blue);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -367,61 +629,99 @@
 </head>
 <body>
 
-  <header>
-    <div class="bot-profile">
-      <img class="header-avatar" src="https://d.top4top.io/p_39776f6w21.jpg" alt="Cow Girl Emma" />
-      <div class="bot-info">
-        <h1>Cow Girl Emma</h1>
-        <div class="status-line">
-          <span class="status-dot" id="statusDot"></span>
-          <span id="statusText">متصل • جاهز</span>
-        </div>
+  <!-- ==================== 1. الواجهة الرئيسية ==================== -->
+  <section id="homeView" class="view active">
+    <header class="home-header">
+      <div class="brand">
+        <span>Yollo RP</span>
+        <span class="brand-badge">FREE</span>
+      </div>
+      <div class="search-box">
+        <input type="search" id="searchInput" placeholder="ابحث عن شخصية..." />
+      </div>
+    </header>
+
+    <div class="filter-section">
+      <div class="pill-tabs" id="categoryTabs">
+        <button class="filter-pill active" data-filter="all">الكل ✨</button>
+        <button class="filter-pill" data-filter="female">أنثى ♀</button>
+        <button class="filter-pill" data-filter="anime">أنيمي</button>
+        <button class="filter-pill" data-filter="story">قصة</button>
       </div>
     </div>
-    <div>
-      <button class="icon-btn danger" id="clearBtn">مسح</button>
+
+    <div class="bots-grid-wrapper">
+      <div class="bots-grid" id="botsGrid"></div>
     </div>
-  </header>
+  </section>
 
-  <main id="chatContainer"></main>
+  <!-- ==================== 2. واجهة المحادثة ==================== -->
+  <section id="chatView" class="view">
+    <header class="chat-header">
+      <div class="chat-header-right">
+        <button class="back-btn" id="backBtn" title="العودة للرئيسية">→</button>
+        <div class="bot-profile">
+          <img class="header-avatar" id="chatHeaderAvatar" src="" alt="" />
+          <div class="bot-info">
+            <h1 id="chatHeaderName">Cow Girl Emma</h1>
+            <div class="status-line">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText">متصل • جاهز</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <button class="icon-btn danger" id="clearBtn">مسح</button>
+      </div>
+    </header>
 
-  <div class="quick-bar" id="quickBar"></div>
+    <main id="chatContainer"></main>
 
-  <div class="input-area">
-    <textarea id="msgInput" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
-    <button id="sendBtn">إرسال</button>
-  </div>
+    <div class="quick-bar" id="quickBar"></div>
+
+    <div class="input-area">
+      <textarea id="msgInput" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
+      <button id="sendBtn">إرسال</button>
+    </div>
+  </section>
 
   <script>
     const API_BASE_URL = "https://hin-18-1.onrender.com";
-    const BOT_AVATAR_URL = "https://d.top4top.io/p_39776f6w21.jpg";
-    const BOT_NAME = "Cow Girl Emma";
-    const BOT_BIO = 'Emma is a little dense cow girl. She does have a very positive energy. Emma loves to bake, insisting on you trying her food. Food she baked with her “secret ingredient”.';
 
-    const STORAGE_KEY_CHAT = "yollo_emma_chat_v3";
-
-    const DEFAULT_MESSAGES = [
+    // قائمة البوتات المتاحة في الواجهة الرئيسية (يمكن إضافة أي بوت جديد هنا مستقبلاً)
+    const BOTS_CATALOG = [
       {
-        role: "bot",
-        type: "text",
-        ltr: true,
-        content: "*You recently inherited a farm from your grandparents. You have always struggled with money so you think life on a farm could work to make an extra buck. When you make it to the farm for the first time. It’s completely dilapidated with no crops or livestock to be seen. When you enter the house off to the side, you find a woman with cow horns and a tail, wearing a cow print bikini and a bell collar sleeping on the floor. She wakes up when you enter.*\n“Hello, master.”"
-      },
-      {
-        role: "bot",
-        type: "image",
-        imageUrl: BOT_AVATAR_URL,
-        content: ""
+        botId: 148005,
+        sessionId: 21702378,
+        name: "Cow Girl Emma",
+        avatarUrl: "https://d.top4top.io/p_39776f6w21.jpg",
+        chatsCount: "4.0m",
+        categories: ["all", "female", "anime", "story"],
+        tags: ["cowgirl", "رعب", "قصة"],
+        bio: 'Emma is a little dense cow girl. She does have a very positive energy. Emma loves to bake, insisting on you trying her food. Food she baked with her “secret ingredient”.',
+        greeting: "*You recently inherited a farm from your grandparents. You have always struggled with money so you think life on a farm could work to make an extra buck. When you make it to the farm for the first time. It’s completely dilapidated with no crops or livestock to be seen. When you enter the house off to the side, you find a woman with cow horns and a tail, wearing a cow print bikini and a bell collar sleeping on the floor. She wakes up when you enter.*\n“Hello, master.”",
+        sendWelcomeImage: true,
+        initialQuickReplies: [
+          { label: "مرحبا", text: "مرحبا" },
+          { label: "*ينظر حوله بدهشة*", text: "*ينظر حوله في المنزل المتهالك بدهشة* من أنتِ؟ وكيف دخلتِ إلى هنا؟" },
+          { label: "أخبريني عن المزرعة", text: "مرحباً إيما، أنا صاحب المزرعة الجديد. أخبريني ما الذي حدث لهذا المكان؟" },
+          { label: "ما سر الكعك؟", text: "سمعت أنكِ تحبين الخبز، ما الذي تطبخينه هنا؟" }
+        ]
       }
     ];
 
-    const INITIAL_QUICK_REPLIES = [
-      { label: "مرحبا", text: "مرحبا" },
-      { label: "*ينظر حوله بدهشة*", text: "*ينظر حوله في المنزل المتهالك بدهشة* من أنتِ؟ وكيف دخلتِ إلى هنا؟" },
-      { label: "أخبريني عن المزرعة", text: "مرحباً إيما، أنا صاحب المزرعة الجديد. أخبريني ما الذي حدث لهذا المكان؟" },
-      { label: "ما سر الكعك؟", text: "سمعت أنكِ تحبين الخبز، ما الذي تطبخينه هنا؟" }
-    ];
+    // عناصر الواجهة الرئيسية
+    const homeView = document.getElementById("homeView");
+    const chatView = document.getElementById("chatView");
+    const botsGrid = document.getElementById("botsGrid");
+    const searchInput = document.getElementById("searchInput");
+    const categoryTabs = document.getElementById("categoryTabs");
 
+    // عناصر واجهة المحادثة
+    const backBtn = document.getElementById("backBtn");
+    const chatHeaderAvatar = document.getElementById("chatHeaderAvatar");
+    const chatHeaderName = document.getElementById("chatHeaderName");
     const chatContainer = document.getElementById("chatContainer");
     const msgInput = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -430,18 +730,9 @@
     const quickBar = document.getElementById("quickBar");
     const clearBtn = document.getElementById("clearBtn");
 
-    function loadSavedMessages() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY_CHAT);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch {}
-      return JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
-    }
-
-    let messages = loadSavedMessages();
+    let activeCategory = "all";
+    let currentBot = null;
+    let messages = [];
     let isSending = false;
 
     function escapeHtml(text) {
@@ -451,6 +742,122 @@
         .replace(/>/g, "&gt;");
     }
 
+    // ==================== منطق الواجهة الرئيسية ====================
+    function renderBotsGrid() {
+      const query = searchInput.value.trim().toLowerCase();
+      botsGrid.innerHTML = "";
+
+      const filteredBots = BOTS_CATALOG.filter(bot => {
+        const matchesCat = activeCategory === "all" || bot.categories.includes(activeCategory);
+        const matchesQuery =
+          !query ||
+          bot.name.toLowerCase().includes(query) ||
+          bot.bio.toLowerCase().includes(query) ||
+          bot.tags.some(t => t.toLowerCase().includes(query));
+        return matchesCat && matchesQuery;
+      });
+
+      filteredBots.forEach(bot => {
+        const card = document.createElement("div");
+        card.className = "bot-card";
+        card.innerHTML = `
+          <div class="card-media">
+            <img src="${bot.avatarUrl}" alt="${escapeHtml(bot.name)}" loading="lazy" />
+            <div class="chat-count-badge">💬 ${escapeHtml(bot.chatsCount)}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${escapeHtml(bot.name)}</div>
+            <div class="card-desc">${escapeHtml(bot.bio)}</div>
+            <div class="card-tags">
+              ${bot.tags.map(tag => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join("")}
+            </div>
+          </div>
+        `;
+        card.onclick = () => openBotChat(bot);
+        botsGrid.appendChild(card);
+      });
+
+      // بطاقة توضيحية لإضافة شخصيات جديدة مستقبلاً
+      const addCard = document.createElement("div");
+      addCard.className = "coming-soon-card";
+      addCard.innerHTML = `
+        <span>➕</span>
+        <p>المزيد من الشخصيات قريباً...</p>
+      `;
+      botsGrid.appendChild(addCard);
+    }
+
+    categoryTabs.querySelectorAll(".filter-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        categoryTabs.querySelectorAll(".filter-pill").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCategory = btn.dataset.filter;
+        renderBotsGrid();
+      });
+    });
+
+    searchInput.addEventListener("input", renderBotsGrid);
+
+    // ==================== التنقل بين الواجهتين ====================
+    function getStorageKey(bot) {
+      return `yollo_chat_bot_${bot.botId}_v1`;
+    }
+
+    function getDefaultMessages(bot) {
+      const list = [
+        {
+          role: "bot",
+          type: "text",
+          ltr: true,
+          content: bot.greeting
+        }
+      ];
+      if (bot.sendWelcomeImage && bot.avatarUrl) {
+        list.push({
+          role: "bot",
+          type: "image",
+          imageUrl: bot.avatarUrl,
+          content: ""
+        });
+      }
+      return list;
+    }
+
+    function loadBotMessages(bot) {
+      try {
+        const raw = localStorage.getItem(getStorageKey(bot));
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+      return getDefaultMessages(bot);
+    }
+
+    function saveMessages() {
+      if (!currentBot) return;
+      localStorage.setItem(getStorageKey(currentBot), JSON.stringify(messages));
+    }
+
+    function openBotChat(bot) {
+      currentBot = bot;
+      chatHeaderAvatar.src = bot.avatarUrl;
+      chatHeaderAvatar.alt = bot.name;
+      chatHeaderName.textContent = bot.name;
+
+      messages = loadBotMessages(bot);
+      renderAllMessages();
+
+      homeView.classList.remove("active");
+      chatView.classList.add("active");
+    }
+
+    backBtn.addEventListener("click", () => {
+      chatView.classList.remove("active");
+      homeView.classList.add("active");
+    });
+
+    // ==================== منطق المحادثة ====================
     function formatRoleplayText(rawText) {
       const tokenRegex = /(\*[^*]+\*|"[^"]+"|“[^”]+”|«[^»]+»)/g;
       const parts = rawText.split(tokenRegex);
@@ -469,7 +876,9 @@
 
     function generateSmartQuickReplies(lastBotText, allMessages = []) {
       const userCount = allMessages.filter(m => m.role === "user").length;
-      if (!lastBotText || userCount === 0) return INITIAL_QUICK_REPLIES;
+      if (!lastBotText || userCount === 0) {
+        return currentBot ? currentBot.initialQuickReplies : [];
+      }
 
       const sentTexts = new Set(
         allMessages.filter(m => m.role === "user").map(m => m.content.trim())
@@ -557,17 +966,14 @@
       }
     }
 
-    function saveMessages() {
-      localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(messages));
-    }
-
     function renderCharacterIntro() {
+      if (!currentBot) return;
       const intro = document.createElement("div");
       intro.className = "character-intro";
       intro.innerHTML = `
-        <img class="intro-avatar" src="${BOT_AVATAR_URL}" alt="${BOT_NAME}" />
-        <div class="intro-name">${BOT_NAME}</div>
-        <div class="intro-bio">${escapeHtml(BOT_BIO)}</div>
+        <img class="intro-avatar" src="${currentBot.avatarUrl}" alt="${escapeHtml(currentBot.name)}" />
+        <div class="intro-name">${escapeHtml(currentBot.name)}</div>
+        <div class="intro-bio">${escapeHtml(currentBot.bio)}</div>
       `;
       chatContainer.appendChild(intro);
     }
@@ -576,11 +982,11 @@
       const row = document.createElement("div");
       row.className = `msg-row ${msg.role}`;
 
-      if (msg.role === "bot" || msg.role === "error") {
+      if ((msg.role === "bot" || msg.role === "error") && currentBot) {
         const avatar = document.createElement("img");
         avatar.className = "msg-avatar";
-        avatar.src = BOT_AVATAR_URL;
-        avatar.alt = BOT_NAME;
+        avatar.src = currentBot.avatarUrl;
+        avatar.alt = currentBot.name;
         row.appendChild(avatar);
       }
 
@@ -592,7 +998,7 @@
         const img = document.createElement("img");
         img.className = "chat-sent-img";
         img.src = msg.imageUrl;
-        img.alt = BOT_NAME;
+        img.alt = currentBot ? currentBot.name : "";
         bubble.appendChild(img);
       } else if (msg.role === "bot") {
         if (msg.ltr) bubble.classList.add("ltr-msg");
@@ -622,7 +1028,7 @@
       row.className = "msg-row bot";
       row.id = "typingIndicator";
       row.innerHTML = `
-        <img class="msg-avatar" src="${BOT_AVATAR_URL}" alt="${BOT_NAME}" />
+        <img class="msg-avatar" src="${currentBot ? currentBot.avatarUrl : ""}" alt="" />
         <div class="bubble">
           <div class="typing-dots"><span></span><span></span><span></span></div>
         </div>
@@ -638,7 +1044,7 @@
 
     async function sendMessage(customText) {
       const text = (customText ?? msgInput.value).trim();
-      if (!text || isSending) return;
+      if (!text || isSending || !currentBot) return;
 
       const userMsg = { role: "user", type: "text", content: text };
       messages.push(userMsg);
@@ -655,7 +1061,11 @@
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
+          body: JSON.stringify({
+            message: text,
+            botId: currentBot.botId,
+            sessionId: currentBot.sessionId
+          })
         });
 
         const data = await response.json();
@@ -698,14 +1108,16 @@
     sendBtn.addEventListener("click", () => sendMessage());
 
     clearBtn.addEventListener("click", () => {
+      if (!currentBot) return;
       if (confirm("هل تريد إعادة المحادثة إلى البداية؟")) {
-        messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+        messages = getDefaultMessages(currentBot);
         saveMessages();
         renderAllMessages();
       }
     });
 
-    renderAllMessages();
+    // تشغيل الواجهة الرئيسية عند فتح الرابط
+    renderBotsGrid();
   </script>
 </body>
 </html>
